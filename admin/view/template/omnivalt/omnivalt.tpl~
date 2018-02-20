@@ -1,0 +1,149 @@
+<?php
+echo $header, $column_left;
+?>
+<div id='content'>
+
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <a href="<?=$cancel;?>" data-toggle="tooltip" title="<?=$button_cancel;?>" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1><?=$heading_title;?></h1>(<?=$currentManifest;?>)
+      
+      <br><ul class="breadcrumb">
+        <?php foreach($breadcrumbs as $breadcrumb):?>
+        <li><a href="<?=$breadcrumb['href'];?>"> <?=$breadcrumb['text'];?></a></li>
+        <?php endforeach;?>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="container-fluid">
+    <div class="panel panel-default">
+              <div class="panel-body">
+<?php if($newOrders != null) { ?>
+<form method="POST" action="<?=$labels;?>" id="new<?=$currentManifest;?>"  target='_blank'>
+
+    <button type='submit' class='btn btn-default btn-sm' form="new<?=$currentManifest;?>" name='print' class='omniv' value='manifest'>Manifestas</button>
+    <button type='submit' class='btn btn-default btn-sm' form="new<?=$currentManifest;?>" name='print' value='labels'>Lipdukai</button>
+
+    <table class='table table-bordered table-hover'>
+    <thead>
+        <th width='5%'>id</th>
+        <th width='15%'>Pirkejas</th>
+        <th width='15%'>Siuntos nr.</th>
+        <th width='15%'>Atnaujinimo data</th>
+        <th width='15%'>Suma</th>
+        <th width='15%'>Lipdukai</th>
+    </thead>
+<?php  foreach($newOrders as $nOrder) {?>
+<tr>
+        <td class='left'><?=$nOrder['order_id'];?></td>
+        <td width='15%'><a href="<?php echo $client.'&order_id='.$nOrder['order_id'];?>" target="_blank"><?=$nOrder['full_name'];?></a></td>
+        <td width='15%'></td>
+        <td width='15%'><?=$nOrder['date_modified'];?></td>
+        <td width='15%'><?=$nOrder['total'];?></td>
+        <td width='15%'>
+        <a href="<?=$genLabels;?>&order_id=<?=$nOrder['order_id'];?>" target="_blank">Generuoti lipdukus</a>
+        <a href="<?=$skip;?>&order_id=<?=$nOrder['order_id'];?>">Praleisti užsakymą</a>
+        <input type='hidden' name='selected[]' value="<?=$nOrder['order_id'];?>">
+        <input type='hidden' name='new' value="new">
+        </td>
+    </tr>
+<?php }
+    }
+    if (count($orders)>0)
+    	$lastManifest = intval($orders[0]['manifest']) +1;
+    else
+    	$lastManifest = null;
+     if($currentManifest == (intval($orders[0]['manifest']) +1) OR $newOrders == null) {
+ ?>
+ </table></form>
+<form method="POST" action="<?=$labels;?>" id="frm<?=$currentManifest;?>"  target='_blank'>
+
+    <button type='submit' class='btn btn-default btn-sm' form="frm<?=$currentManifest;?>" name='print' class='omniv' value='manifest'>Manifestas</button>
+    <button type='submit' class='btn btn-default btn-sm' form="frm<?=$currentManifest;?>" name='print' value='labels'>Lipdukai</button>
+
+    <table class='table table-bordered table-hover'>
+    <thead>
+        <th width='5%'>id</th>
+        <th width='15%'>Pirkejas</th>
+        <th width='15%'>Siuntos nr.</th>
+        <th width='15%'>Atnaujinimo data</th>
+        <th width='15%'>Suma</th>
+        <th width='15%'>Lipdukai</th>
+    </thead>
+    <?php } ?>
+<?php  foreach($orders as $order) {
+     if(isset($manifest) && $order['manifest'] != $manifest) {
+                //print"<tr><td colspan='5'><hr></td><td><input type='submit' value='Manifestas' class='btn btn-primary btn-sm'></form><form method='POST' action=".$labels." target='_blank'></td><tr>";
+     ?>
+     </table>
+     </form>
+     <form method="POST" action="<?=$labels;?>" id="frm<?=$order['manifest'];?>"  target='_blank'>
+
+    <button type='submit' form="frm<?=$order['manifest'];?>" class='btn btn-default btn-sm' name='print' class='omniv' value='manifest'>Manifestas</button>
+    <button type='submit' form="frm<?=$order['manifest'];?>" class='btn btn-default btn-sm' name='print' value='labels'>Lipdukai</button>
+
+    <table class='table table-bordered table-hover'>
+    <thead>
+        <th width='5%'>id</th>
+        <th width='15%'>Pirkejas</th>
+        <th width='15%'>Siuntos nr.</th>
+        <th width='15%'>Atnaujinimo data</th>
+        <th width='15%'>Suma</th>
+        <th width='15%'>Lipdukai</th>
+    </thead>
+     <?php
+     }
+            $manifest = $order['manifest'];
+    ?>
+    <tr>
+        <td><?=$order['order_id'];?></td>
+        <td><a href="<?php echo $client.'&order_id='.$order['order_id'];?>"><?=$order['full_name'];?></a></td>
+        <td>
+        <?php 
+        //var_dump(json_decode($order['tracking']));
+        $variable = json_decode($order['tracking']);
+        for($i=0; $i<count($variable); $i++) {
+            echo $variable[$i].'<br>';
+        }
+        ?>
+        </td>
+        <td><?=$order['date_modified'];?></td>
+        <td><?=$order['total'];?></td>
+        <?php /*<td><?=$order['labels'];?></td>*/?>
+        <td ><?php echo $order['manifest'];?>
+        <a href="<?=$genLabels;?>&order_id=<?=$order['order_id'];?>" target="_blank">Generuoti lipdukus</a>
+        <?php if($order['manifest'] == -1){?>
+            <a href="<?=$cancelSkip;?>&order_id=<?=$order['order_id'];?>">Pridet prie manifesto</a>
+        <?php } ?>
+        <input type='hidden' name='selected[]' value="<?=$order['order_id'];?>">
+        <input type='hidden' name='manifest' value="<?=$order['manifest'];?>">
+        </td>
+    </tr>
+
+<?php 
+}?></form></td>
+    </table>
+    <div class="text-center">
+        <?php echo $pagination; ?>
+    </div>
+    </div>
+    </div>
+</div>
+</div>
+<?php
+echo $footer;
+var_dump($newOrders);
+/*
+function triple($x = 100)
+{
+    print $x . "\r";
+    $x += 2;
+    if($x<999)
+        triple($x);
+}
+
+triple();
+print'<br>fdsfsddsads<br><br>';*/

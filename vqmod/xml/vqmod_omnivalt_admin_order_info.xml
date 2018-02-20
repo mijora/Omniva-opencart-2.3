@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <id>Admin order list buttons</id>
+    <version>1.0.0</version>
+    <vqmver required="true">2.5.0</vqmver>
+    <author></author>
+    <file name="admin/view/template/sale/order_info.tpl">
+        <operation>
+            <search position="ibefore"><![CDATA[
+            <a href="<?php echo $invoice; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $button_invoice_print; ?>" class="btn btn-info"><i class="fa fa-print"></i></a>
+            ]]></search>
+            <add><![CDATA[
+                <a href="<?php echo $omnivalt_label; ?>" target="_blank" data-toggle="tooltip" title="<?=$generate_labels;?>" class="btn btn-warning"><i class="fa fa-barcode"></i></a>
+            ]]></add>
+        </operation>
+          <operation>
+            <search position="ibefore"><![CDATA[<h3 class="panel-title"><i class="fa fa-info-circle"></i> <?php echo $text_order; ?></h3>]]></search>
+                        <add><![CDATA[
+              <?php 
+if(substr($orderCarrier, 0, 8) == 'omnivalt') {
+?>
+<form method="POST" action="<?= $editOmniva ;?>" >
+<input type="hidden" value="<?= $order_id; ?>" name="order_id">
+   
+        <h3 class="panel-title"><i class="fa fa-info-circle"></i> <?$heading_title;?></h3>
+      </div>
+                <table class="table">
+            <tbody>
+            <tr>
+              <td colspan="2"><?=$labels_count;?>
+              <select name="labelsCount" id="labelsCount" class="form-control input-sm">
+               <option value="1" selected="">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            </select>
+         
+              <td colspan="2"><?=$weight;?> <input type="number" step="0.0001" name="omnivaWeight" class="form-control input-sm" value="<?= $omnivaWeight; ?>"></td>
+            </tr>
+            <tr>
+              <td colspan="2">C.O.D 
+        <select name="cod_available" class="form-control input-sm">
+        <option value="0">Ne</option>
+               <option value="1" <?php if(($payment_code == 'cod' OR $cod_amount >0) && $cod_amount != 888888) { ?> selected="" <?php } ?>>Taip</option>
+                            
+                            </select>              </td>
+              <td colspan="2"><?=$text_cod_amount;?><input type="text" name="cod_value" class="form-control input-sm" value="<?php if($cod_amount && $cod_amount != 888888) print $cod_amount; else print $orderTotal; ?>"></td>
+            </tr>
+              <tr>
+              <td colspan="4"><?=$delivery_method;?>
+              <select name="delivery_method" class="form-control input-sm">
+               <option disabled>Select labels count</option>
+               <option value="omnivalt.courier|OmnivaLt kurjeris">Omnivalt Courier</option>
+                            <?php $parcel_terminals = '';
+                            $grouped_options = array();
+          foreach ($omniva_terminals as $terminal){
+            if (!isset($grouped_options[$terminal[1]]))
+              $grouped_options[(string)$terminal[1]] = array();
+              $grouped_options[(string)$terminal[1]][(string)$terminal[3]] = $terminal[0].', '.$terminal[2];  
+            }
+          foreach ($grouped_options as $city=>$locs){
+          $parcel_terminals .= '<optgroup label = "'.$city.'">';
+            foreach ($locs as $key=>$loc){
+              $parcel_terminals .= '<option value = "omnivalt.parcel_terminal_'.$key.'|'.$loc.'" '.('omnivalt.parcel_terminal_'.$key == $shipping_code ?'selected':'').'>'.$loc.'</option>';
+            }
+            $parcel_terminals .= '</optgroup>';
+          }
+        print $parcel_terminals;
+                            ?>
+                            </select>
+              </td>
+              </tr>
+            </tbody>
+          </table>
+          <input type="submit" name="update" class="btn btn-default btn-sm" value="<?=$renew;?>">
+          <input type="submit" name="generateLabel" class="btn btn-default btn-sm" value="<?=$generate_label;?>">
+    </div>
+    </form>
+<?php } ?>
+ <div class="panel panel-default">
+      <div class="panel-heading">
+                        ]]></add>
+        </operation>
+   </file>
+</modification>
