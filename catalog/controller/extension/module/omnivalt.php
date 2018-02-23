@@ -6,18 +6,14 @@
  */
 class ControllerExtensionModuleOmnivalt extends Controller
 {
-
     public function index()
     {
-
         $this->fetchUpdates();
-
         return 'succes';
     }
 
     public function fetchUpdates()
     {
-
         $terminals = array();
         $csv = $this->fetchURL('https://www.omniva.ee/locations.csv');
         if (empty($csv)) {
@@ -37,12 +33,10 @@ class ControllerExtensionModuleOmnivalt extends Controller
         $this->db->query("UPDATE " . DB_PREFIX . "setting
          SET `value` = '" . $this->db->escape(json_encode($terminals)) . "', serialized = '1'
          WHERE `key` = '" . $this->db->escape($key) . "'");
-
     }
 
     private function fetchURL($url)
     {
-
         $ch = curl_init(trim($url)) or die('cant create curl');
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -77,7 +71,7 @@ class ControllerExtensionModuleOmnivalt extends Controller
         array_shift($rows);
 
         foreach ($rows as $row) {
-            $cabin = str_getcsv($row, ';'); //parse the items in rows
+            $cabin = str_getcsv($row, ';');
             # there are lines with all fields empty in estonian file, workaround
             if (count(array_filter($cabin))) {
                 if ($newformat) {

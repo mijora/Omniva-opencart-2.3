@@ -23,15 +23,12 @@ class ModelExtensionShippingOmnivalt extends Model
                 if ($address['iso_code_2'] == 'LV' && $service == "parcel_terminal") {
                     $cost = $this->config->get('omnivalt_parcel_terminal_pricelv');
                 }
-
                 if ($address['iso_code_2'] == 'LV' && $service == "courier") {
                     $cost = $this->config->get('omnivalt_courier_pricelv');
                 }
-
                 if ($address['iso_code_2'] == 'EE' && $service == "parcel_terminal") {
                     $cost = $this->config->get('omnivalt_parcel_terminal_priceee');
                 }
-
                 if ($address['iso_code_2'] == 'EE' && $service == "courier") {
                     $cost = $this->config->get('omnivalt_courier_priceee');
                 }
@@ -60,9 +57,9 @@ class ModelExtensionShippingOmnivalt extends Model
                 $title = $this->language->get('text_' . $service);
                 if ($service == "parcel_terminal" && $cabins = $this->config->get('omnivalt_terminals_LT')) {
                     $cabine_select = '<script>$( "input[name=shipping_method]" ).focus(function() { $( this ).blur(); });</script>
-<select name="omnivalt_parcel_terminal" id="omnivalt_parcel_terminal"  class="form-control form-inline input-sm" style="width: 70%; display: inline;"
-onchange="$(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).val($(this).val()); $(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).prop(\'checked\',true);"
-onfocus="$(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).prop(\'checked\',true);">';
+                    <select name="omnivalt_parcel_terminal" id="omnivalt_parcel_terminal"  class="form-control form-inline input-sm" style="width: 70%; display: inline;"
+                    onchange="$(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).val($(this).val()); $(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).prop(\'checked\',true);"
+                    onfocus="$(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).prop(\'checked\',true);">';
 
                     usort($cabins, function ($a, $b) {if ($a[1] == $b[1]) {
                         return ($a[0] < $b[0]) ? -1 : 1;
@@ -71,18 +68,17 @@ onfocus="$(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).prop(\'
                     $cabine_select .= $this->groupTerminals($cabins, $address['iso_code_2']);
                     $terminalsArr = array();
                     foreach ($cabins as $cabin) {
-                        if (isset($cabin[5]) && $cabin[5] == $address['iso_code_2']) {
+                        /*if (isset($cabin[5]) && $cabin[5] == $address['iso_code_2']) {
 
                             $idArr = 'parcel_terminal_' . $cabin[3];
                             $titleArr = $cabin[0] . ' ' . $cabin[2];
                             $terminalsArr[$idArr] = $titleArr;
-                        }
+                        } uncomment for quick checkout */
 
                         if (!$first) {
                             $first = $cabin[3];
                         }
 
-                        //$cabine_select .= '<option value="omnivalt.parcel_terminal_'.$cabin[3].'">'.$cabin[0].' '.$cabin[2].'</option>'."\n";
                         $sub_quote['parcel_terminal_' . $cabin[3]] = array(
                             'code' => 'omnivalt.parcel_terminal_' . $cabin[3],
                             'title' => $title . ': ' . $cabin[0] . ' ' . $cabin[2],
@@ -98,7 +94,6 @@ onfocus="$(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).prop(\'
                             'tax_class_id' => 0,
                             'text' => 'fake',
                         );
-
                     }
                     $cabine_select .= '</select>';
                 }
@@ -107,12 +102,12 @@ onfocus="$(\'#omnivalt_parcel_terminal\').parent().find(\'input\').eq(0).prop(\'
                 if ($service == "parcel_terminal") {
                     $code = 'fake';
                 } else { $terminalsArr = array();}
-/* uncoment for quick checkout
-if(isset($cabins))
-$terminalOpt = $this->groupTerminals2($cabins, $address['iso_code_2']);
-else
-$terminalOpt = null;
- */
+                /* uncoment for quick checkout
+                if(isset($cabins))
+                $terminalOpt = $this->groupTerminals2($cabins, $address['iso_code_2']);
+                else
+                $terminalOpt = null;
+                */
                 $quote_data[$service] = array(
                     'code' => $code . '.' . $service,
                     'title' => $title . $cabine_select,
@@ -169,32 +164,6 @@ $terminalOpt = null;
             }
         }
         $parcel_terminals = '<option value = "" selected disabled>' . $this->language->get('text_select_terminal') . '</option>' . $parcel_terminals;
-        return $parcel_terminals;
-    }
-
-    private function groupTerminals2($terminals, $country = 'LT', $selected = '')
-    {
-        $parcel_terminals = '';
-        if (is_array($terminals)) {
-            $grouped_options = array();
-            foreach ($terminals as $terminal) {
-                if (isset($terminal[5]) && $terminal[5] == $country) {
-                    if (!isset($grouped_options[$terminal[1]])) {
-                        $grouped_options[(string) $terminal[1]] = array();
-                    }
-
-                    $grouped_options[(string) $terminal[1]][(string) $terminal[3]] = $terminal[0] . ', ' . $terminal[2];
-                }
-            }
-            foreach ($grouped_options as $city => $locs) {
-                $parcel_terminals .= '<optgroup label = "' . $city . '">';
-                foreach ($locs as $key => $loc) {
-                    $parcel_terminals .= '<option value = "parcel_terminal_' . $key . '" ' . ($key == $selected ? 'selected' : '') . '>' . $loc . '</option>';
-                }
-                $parcel_terminals .= '</optgroup>';
-            }
-        }
-        //$parcel_terminals = '<option value = "" selected disabled>'.$this->language->get('text_select_terminal').'</option>'.$parcel_terminals;
         return $parcel_terminals;
     }
 }

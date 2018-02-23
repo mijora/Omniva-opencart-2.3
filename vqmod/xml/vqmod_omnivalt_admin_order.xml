@@ -21,14 +21,14 @@
             ]]></add>
         </operation>
     </file>
-        <file name="admin/model/sale/order.php">
+    <file name="admin/model/sale/order.php">
         <operation>
             <search position="iafter"><![CDATA[ $order_query->row['date_modified']]]></search>
             <add><![CDATA[
                 ,'labelsCount'           => $order_query->row['labelsCount'],
                 'omnivaWeight'           => $order_query->row['omnivaWeight'],
                 'cod_amount'             => $order_query->row['cod_amount']
-                ]]></add>
+            ]]></add>
         </operation>
     </file>
 </modification>

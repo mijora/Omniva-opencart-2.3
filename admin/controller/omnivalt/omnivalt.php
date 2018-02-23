@@ -62,11 +62,7 @@ class ControllerOmnivaltOmnivalt extends Controller
                     ORDER BY order_id DESC
                     ;");
         $data['newOrders'] = $newOrders->rows;
-        /*if($page > 1)
-        $data['newOrders'] = null;
-         */
         $data['newPage'] = $newOrders->rows;
-        //if($page > 1)
         $data['newPage'] = null;
         $data['skipped'] = $skipped->rows;
         $data['header'] = $this->load->controller('common/header');
@@ -101,7 +97,7 @@ class ControllerOmnivaltOmnivalt extends Controller
         $data['phone'] = $this->config->get('omnivalt_sender_phone');
         $data['postcode'] = $this->config->get('omnivalt_sender_postcode');
         $data['address'] = $this->config->get('omnivalt_sender_country_code') . ' ' . $this->config->get('omnivalt_sender_address');
-        //$this->newManifest();
+        
         $data['text_new_orders'] = $this->language->get('text_new_orders');
         $data['text_awaiting'] = $this->language->get('text_awaiting');
         $data['text_completed'] = $this->language->get('text_completed');

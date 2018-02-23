@@ -4,8 +4,8 @@
     <version>1.0.0</version>
     <vqmver required="true">2.5.0</vqmver>
     <author></author>
- <file path="admin/controller/common/column_left.php">
-    <operation>
+    <file path="admin/controller/common/column_left.php">
+     <operation>
         <search><![CDATA[$extension = array();]]></search>
             <add position="iafter"><![CDATA[   
             $this->load->language('extension/shipping/omnivalt');                 

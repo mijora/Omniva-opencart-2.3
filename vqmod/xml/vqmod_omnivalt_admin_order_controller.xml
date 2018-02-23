@@ -26,7 +26,7 @@
             $data['omnivalt_label_print'] = $this->url->link('extension/shipping/omnivalt/labelsprint', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);		              
             ]]></add>
         </operation>
-        	                <operation>
+        <operation>
             <search position="iafter"><![CDATA[$data['payment_method'] = $order_info['payment_method'];]]></search>
             <add><![CDATA[
             			/* Additional field */

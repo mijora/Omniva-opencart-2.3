@@ -4,7 +4,6 @@
     <version>1.4.x and above</version>
     <vqmver required="true">2.6.0</vqmver>
     <author>vqmod.com</author>
-
     <file name="system/startup.php,system/engine/*.php,system/library/*.php,admin/controller/extension/*.php,system/library/template/*.php,catalog/controller/event/theme.php,system/library/template/Twig/*.php" error="skip">
         <operation error="skip" info="For non OCMod includes/requires">
             <search position="replace" regex="true"><![CDATA[~^(\s*)(require|include)(_once)?(\s+|\()(?!VQMod::modCheck\()(?!modification\()([^);]+)~]]></search>
@@ -15,20 +14,16 @@
             <add><![CDATA[$1$2(\\VQMod::modCheck(modification($3), $3]]></add>
         </operation>
 	</file>
-
     <file name="system/library/template/Twig/*.php" error="skip">
 	    <operation error="skip" info="Add Twig support">
             <search position="replace"><![CDATA[dirname(__FILE__).'/../']]></search>
             <add><![CDATA[DIR_SYSTEM . 'library/template/']]></add>
         </operation>
     </file>
-
     <file name="system/library/template/Twig/Loader/*.php" error="skip">
 	    <operation error="skip" info="Add Twig support">
             <search position="replace"><![CDATA[= $realpath;]]></search>
             <add><![CDATA[= VQMod::modCheck($realpath, DIR_TEMPLATE . $name);]]></add>
         </operation>
-    </file>
-
-    
+    </file>  
 </modification>
