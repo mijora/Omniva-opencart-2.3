@@ -1,4 +1,9 @@
 <?php
+/**
+ * Generating omnivalt shipping selector
+ * within opencart checkout 3 states available
+ * courier and parcel terminals
+ */
 class ModelExtensionShippingOmnivalt extends Model
 {
     public function getQuote($address)
@@ -111,7 +116,7 @@ class ModelExtensionShippingOmnivalt extends Model
                 $quote_data[$service] = array(
                     'code' => $code . '.' . $service,
                     'title' => $title . $cabine_select,
-                    'terminals' => $terminalsArr,
+                    //'terminals' => $terminalsArr,
                     //'terminals0' => $terminalOpt, //row for quick checkout
                     'cost' => $this->currency->convert($cost, $currency, $this->config->get('config_currency')),
                     'tax_class_id' => 0,

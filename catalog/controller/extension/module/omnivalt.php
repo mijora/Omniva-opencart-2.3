@@ -2,13 +2,14 @@
 /*
  * Class for automatic updates
  * public access
- *
+ * @UpdateTerminals
  */
 class ControllerExtensionModuleOmnivalt extends Controller
 {
     public function index()
     {
         $this->fetchUpdates();
+        print 'Omniva terminal succesfully update';
         return 'succes';
     }
 

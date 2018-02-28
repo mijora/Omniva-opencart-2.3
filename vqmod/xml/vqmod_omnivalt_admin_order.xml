@@ -9,7 +9,6 @@
             <search position="ibefore"><![CDATA[<button type="submit" id="button-shipping" form="form-order" ]]></search>
             <add><![CDATA[
                 <button type="submit" id="button-omnivalt-labels" form="form-order" formaction="<?php echo $omnivalt_label; ?>" formtarget="_blank" data-toggle="tooltip" title="<?=$generate_labels;?>" class="btn btn-warning"><i class="fa fa-barcode"></i></button>
-                <button type="submit" id="button-omnivalt-manifests" form="form-order" formaction="<?php echo $omnivalt_manifest; ?>" formtarget="_blank" data-toggle="tooltip" title="<?=$text_manifest;?>" class="btn btn-info"><i class="fa fa-file-text"></i></button>
             ]]></add>
         </operation>
         <operation>

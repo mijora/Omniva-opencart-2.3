@@ -3,16 +3,13 @@
  * Controller for listing omnivalt orders and creating manifest
  *
  * As well saving its history for futher review
+ * @Page omnivalt/orders
  */
 class ControllerOmnivaltOmnivalt extends Controller
 {
     public function index()
     {
-        /*
-        $addColumns =" ALTER TABLE ".DB_PREFIX."order ADD `omnivaWeight` INT NOT NULL DEFAULT '1',
-        ADD `cod_amount` INT DEFAULT 0;";
-        $this->db->query($addColumns);
-         */
+
         $this->load->language('extension/shipping/omnivalt');
         $manifest = intval($this->config->get('omniva_manifest'));
         $data['heading_title'] = $this->language->get('heading_title');
@@ -86,8 +83,8 @@ class ControllerOmnivaltOmnivalt extends Controller
         $data['cancelSkip'] = $this->url->link('omnivalt/omnivalt/cancelSkip', 'token=' . $this->session->data['token'], true);
         $data['cancel'] = $this->url->link('extension/extension', 'token=' . $this->session->data['token'] . '&type=shipping', true);
         $data['client'] = $this->url->link('sale/order/info', 'token=' . $this->session->data['token'], true);
-        $data['genLabels'] = $this->url->link('extension/shipping/omnivalt/labels', 'token=' . $this->session->data['token'], true);
-        $data['labels'] = $this->url->link('extension/shipping/omnivalt/printDocs', 'token=' . $this->session->data['token'], true);
+        $data['genLabels'] = $this->url->link('omnivalt/omnivaltPrints/labels', 'token=' . $this->session->data['token'], true);
+        $data['labels'] = $this->url->link('omnivalt/omnivaltPrints/printDocs', 'token=' . $this->session->data['token'], true);
         $data['currentManifest'] = $this->config->get('omniva_manifest');
         $data['newManifest'] = 'Naujas Manifestas';
         $data['token'] = $this->session->data['token'];
@@ -97,7 +94,7 @@ class ControllerOmnivaltOmnivalt extends Controller
         $data['phone'] = $this->config->get('omnivalt_sender_phone');
         $data['postcode'] = $this->config->get('omnivalt_sender_postcode');
         $data['address'] = $this->config->get('omnivalt_sender_country_code') . ' ' . $this->config->get('omnivalt_sender_address');
-        
+        //$this->newManifest();
         $data['text_new_orders'] = $this->language->get('text_new_orders');
         $data['text_awaiting'] = $this->language->get('text_awaiting');
         $data['text_completed'] = $this->language->get('text_completed');
@@ -255,8 +252,8 @@ class ControllerOmnivaltOmnivalt extends Controller
             </xsd:businessToClientMsgRequest>
          </soapenv:Body>
       </soapenv:Envelope>';
-        $response = $this->load->controller('extension/shipping/omnivalt/api_request', $xmlRequest);
-        //$response['status'] = true;
+        //$response = $this->load->controller('omnivalt/omnivaltAPI/api_request', $xmlRequest);
+        $response['status'] = true;
         if ($response['status']) {
             return $this->response->setOutput('got_request');
         } else {

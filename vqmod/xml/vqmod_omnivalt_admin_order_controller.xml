@@ -10,11 +10,11 @@
             $data['shipping'] = $this->url->link('sale/order/shipping', 'token=' . $this->session->data['token'], true);
             ]]></search>
             <add><![CDATA[
-                $data['omnivalt_label'] = $this->url->link('extension/shipping/omnivalt/labels', 'token=' . $this->session->data['token'], true);
+                $data['omnivalt_label'] = $this->url->link('omnivalt/omnivaltPrints/labels', 'token=' . $this->session->data['token'], true);
                 $this->load->language('extension/shipping/omnivalt');
                 $data['generate_labels']   =$this->language->get('generate_labels');
                 $data['text_manifest']   =$this->language->get('print_manifest');
-                $data['omnivalt_manifest'] = $this->url->link('extension/shipping/omnivalt/manifest', 'token=' . $this->session->data['token'], true);
+                $data['omnivalt_manifest'] = $this->url->link('omnivalt/omnivaltPrints/manifest', 'token=' . $this->session->data['token'], true);
             ]]></add>
         </operation>
         <operation>
@@ -22,8 +22,8 @@
             $data['invoice'] = $this->url->link('sale/order/invoice', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);		
             ]]></search>
             <add><![CDATA[
-            $data['omnivalt_label'] = $this->url->link('extension/shipping/omnivalt/labels', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);		    
-            $data['omnivalt_label_print'] = $this->url->link('extension/shipping/omnivalt/labelsprint', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);		              
+            $data['omnivalt_label'] = $this->url->link('omnivalt/omnivaltPrints/labels', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);		    
+            $data['omnivalt_label_print'] = $this->url->link('omnivalt/omnivaltPrints/labelsprint', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);		              
             ]]></add>
         </operation>
         <operation>
@@ -36,7 +36,7 @@
 			$data['cod_amount'] = $order_info['cod_amount'];
 			$data['omniva_terminals'] = $this->config->get('omnivalt_terminals_LT');
 			$data['shipping_code'] = $order_info['shipping_code'];
-			$data['editOmniva'] = $this->url->link('extension/shipping/omnivalt/editLabel', 'token=' . $this->session->data['token']. '&order_id='.$data['order_id'], true);
+			$data['editOmniva'] = $this->url->link('omnivalt/omnivaltPrints/editLabel', 'token=' . $this->session->data['token']. '&order_id='.$data['order_id'], true);
 			$data['payment_code'] = $order_info['payment_code'];
 			$data['orderTotal'] = $order_info['total'];
 
