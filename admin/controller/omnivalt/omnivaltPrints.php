@@ -58,6 +58,12 @@ class ControllerOmnivaltOmnivaltPrints extends Controller
         };
     }
 
+    /**
+     * Send email message about order
+     * then label is generated
+     * @Throwable exception
+     * @return true
+     */
     private function sendNotification($id_order = '', $tracking = '154233775CE')
     {
 
@@ -136,6 +142,11 @@ class ControllerOmnivaltOmnivaltPrints extends Controller
         return '';
     }
 
+    /**
+     * Proxy method
+     * links manifest/labels
+     * @return generated pdf
+     */
     public function printDocs()
     {
         if (!isset($this->request->post['print'])) {
@@ -494,6 +505,10 @@ class ControllerOmnivaltOmnivaltPrints extends Controller
         }
     }
 
+    /**
+     * Manualy set label info from
+     * Omniva selected order
+     */
     public function editLabel()
     {
         if (!isset($this->request->post['labelsCount'])) {

@@ -147,15 +147,6 @@ class ControllerOmnivaltOmnivaltAPI extends Controller
 
 		                       </item>';
         endfor;
-        /*
-        <onloadAddressee>
-        <person_name>'.$this->config->get('omnivalt_sender_name').'</person_name>
-        <!--Optional:-->
-        <phone>'.$this->config->get('omnivalt_sender_phone').'</phone>
-        <address postcode="'.$this->config->get('omnivalt_sender_postcode').'" deliverypoint="'.$this->config->get('omnivalt_sender_city').'" country="'.$this->config->get('omnivalt_sender_country_code').'" street="'.$this->config->get('omnivalt_sender_address').'" />
-        <pick_up_time start="'.date("c", strtotime($pickDay.' '.$pickStart)).'" finish="'.date("c", strtotime($pickDay.' '.$pickFinish)).'"/>
-        </onloadAddressee>
-         */
         $xmlRequest .= '
                     </item_list>
                  </interchange>
@@ -359,18 +350,7 @@ class ControllerOmnivaltOmnivaltAPI extends Controller
                 }
             }
         }
-        /*
-        if (!empty($resultArr)) {
-        foreach ($resultArr as $trackNum => $data) {
-        $tracking = $this->_trackStatusFactory->create();
-        $tracking->setCarrier($this->_code);
-        $tracking->setCarrierTitle($this->getConfigData('title'));
-        $tracking->setTracking($trackNum);
-        $tracking->addData($data);
-        $result->append($tracking);
-        }
-        }
-         */
+
         if (!empty($errors)) {
             return false;
         }
