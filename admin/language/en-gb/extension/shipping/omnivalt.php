@@ -80,4 +80,4 @@ $_['text_skipped_zero']     = 'Nothing to show, skipped orders count is zero!!!'
 $_['text_new_zero']         = 'Nothing to show, skipped orders count is zero!!!';
 $_['text_start_search']     = 'Užpildykite laukus pradėti paiešką.';
 $_['text_start_search']     = 'Fill fields to start search.';
-
+$_['entry_free_price']      = "Make shipping free from this price";

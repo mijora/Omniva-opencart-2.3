@@ -19,18 +19,29 @@ class ModelExtensionShippingOmnivalt extends Model
             foreach ($services as $key => $service) {
                 $cabine_select = '';
                 $first = '';
+                $cart_price = $this->cart->getTotal();
                 $cost = $this->config->get('omnivalt_' . $service . '_price');
+                if($cart_price > $this->config->get('omnivalt_lt_free'))
+                    $cost = 0;
                 if ($address['iso_code_2'] == 'LV' && $service == "parcel_terminal") {
                     $cost = $this->config->get('omnivalt_parcel_terminal_pricelv');
+                    if($cart_price > $this->config->get('omnivalt_lv_free'))
+                        $cost = 0;
                 }
                 if ($address['iso_code_2'] == 'LV' && $service == "courier") {
                     $cost = $this->config->get('omnivalt_courier_pricelv');
+                    if($cart_price > $this->config->get('omnivalt_lv_free'))
+                        $cost = 0;
                 }
                 if ($address['iso_code_2'] == 'EE' && $service == "parcel_terminal") {
                     $cost = $this->config->get('omnivalt_parcel_terminal_priceee');
+                    if($cart_price > $this->config->get('omnivalt_ee_free'))
+                        $cost = 0;
                 }
                 if ($address['iso_code_2'] == 'EE' && $service == "courier") {
                     $cost = $this->config->get('omnivalt_courier_priceee');
+                    if($cart_price > $this->config->get('omnivalt_ee_free'))
+                        $cost = 0;
                 }
 
                 if (stripos($cost, ':') !== false) {

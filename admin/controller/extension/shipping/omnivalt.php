@@ -65,7 +65,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
         }
 
-        foreach (array('cron_url', 'heading_title', 'text_edit', 'text_enabled', 'text_disabled', 'text_yes', 'text_no', 'text_none', 'text_parcel_terminal', 'text_courier', 'text_sorting_center', 'entry_url', 'entry_user', 'entry_password', 'entry_service', 'entry_pickup_type', 'entry_company', 'entry_bankaccount', 'entry_pickupstart', 'entry_pickupfinish', 'entry_cod', 'entry_status', 'entry_sort_order', 'entry_parcel_terminal_price', 'entry_courier_price', 'entry_terminals', 'button_save', 'button_cancel', 'button_download', 'entry_sender_name', 'entry_sender_address', 'entry_sender_city', 'entry_sender_postcode', 'entry_sender_phone', 'entry_sender_country_code') as $key) {
+        foreach (array('entry_free_price', 'cron_url', 'heading_title', 'text_edit', 'text_enabled', 'text_disabled', 'text_yes', 'text_no', 'text_none', 'text_parcel_terminal', 'text_courier', 'text_sorting_center', 'entry_url', 'entry_user', 'entry_password', 'entry_service', 'entry_pickup_type', 'entry_company', 'entry_bankaccount', 'entry_pickupstart', 'entry_pickupfinish', 'entry_cod', 'entry_status', 'entry_sort_order', 'entry_parcel_terminal_price', 'entry_courier_price', 'entry_terminals', 'button_save', 'button_cancel', 'button_download', 'entry_sender_name', 'entry_sender_address', 'entry_sender_city', 'entry_sender_postcode', 'entry_sender_phone', 'entry_sender_country_code') as $key) {
             $data[$key] = $this->language->get($key);
         }
 
@@ -79,7 +79,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
         $sender_array = array('sender_name', 'sender_address', 'sender_phone',
             'sender_postcode', 'sender_city', 'sender_country_code',
             'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee',
-            'courier_price', 'courier_pricelv', 'courier_priceee',
+            'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free'
         );
         foreach ($sender_array as $key) {
             if (isset($this->error[$key])) {
@@ -244,6 +244,28 @@ class ControllerExtensionShippingOmnivalt extends Controller
         } else {
             $data['omnivalt_sort_order'] = $this->config->get('omnivalt_sort_order');
         }
+
+        if (isset($this->request->post['omnivalt_lt_free'])) {
+			$data['omnivalt_lt_free'] = $this->request->post['omnivalt_lt_free'];
+		} else {
+			$data['omnivalt_lt_free'] = $this->config->get('omnivalt_lt_free');
+        }
+        if (isset($this->request->post['omnivalt_lv_free'])) {
+                $data['omnivalt_lv_free'] = $this->request->post['omnivalt_lv_free'];
+            } else {
+                $data['omnivalt_lv_free'] = $this->config->get('omnivalt_lv_free');
+        }
+        if (isset($this->request->post['omnivalt_ee_free'])) {
+			$data['omnivalt_ee_free'] = $this->request->post['omnivalt_ee_free'];
+		} else {
+			$data['omnivalt_ee_free'] = $this->config->get('omnivalt_ee_free');
+		}
+    
+		if (isset($this->request->post['omnivalt_sort_order'])) {
+			$data['omnivalt_sort_order'] = $this->request->post['omnivalt_sort_order'];
+		} else {
+			$data['omnivalt_sort_order'] = $this->config->get('omnivalt_sort_order');
+		}
         $data['omnivalt_terminals'] = $this->model_setting_setting->getSetting('omnivalt_terminals');
 
         $data['header'] = $this->load->controller('common/header');
@@ -270,7 +292,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $this->error['password'] = $this->language->get('error_password');
         }
 
-        foreach (array('sender_name', 'sender_address', 'sender_phone', 'sender_postcode', 'sender_city', 'sender_country_code', 'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee', 'courier_price', 'courier_pricelv', 'courier_priceee') as $key) {
+        foreach (array('sender_name', 'sender_address', 'sender_phone', 'sender_postcode', 'sender_city', 'sender_country_code', 'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee', 'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free') as $key) {
             if (!$this->request->post['omnivalt_' . $key]) {
                 $this->error[$key] = $this->language->get('error_required');
             }
