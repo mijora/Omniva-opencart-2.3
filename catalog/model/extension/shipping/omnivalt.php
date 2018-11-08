@@ -93,9 +93,15 @@ class ModelExtensionShippingOmnivalt extends Model
                         $sub_quote['parcel_terminal_' . $cabin[3]] = array(
                             'code' => 'omnivalt.parcel_terminal_' . $cabin[3],
                             'title' => $title . ': ' . $cabin[0] . ' ' . $cabin[2],
-                            'cost' => $this->currency->convert($cost, $currency, $this->config->get('config_currency')),
+                        /*    'cost' => $this->currency->convert($cost, $currency, $this->config->get('config_currency')),
                             'tax_class_id' => 0,
                             'text' => ' ' . $this->currency->format($this->currency->convert($cost, $currency, $this->session->data['currency']), $this->session->data['currency']),
+                        */
+                        'cost'         => $cost,
+                        'tax_class_id' => $this->config->get('omnivalt_tax_class_id'),
+                        'text'         => $this->currency->format($this->tax->calculate($cost, $this->config->get('omnivalt_class_id'), $this->config->get('config_tax')), $this->session->data['currency'])
+                
+                        
                         );
 
                         $sub_quote['parcel_terminal_fake' . $cabin[3]] = array(
@@ -124,9 +130,14 @@ class ModelExtensionShippingOmnivalt extends Model
                     'title' => $title . $cabine_select,
                     'terminals' => $terminalsArr,
                     //'terminals0' => $terminalOpt, //row for quick checkout
-                    'cost' => $this->currency->convert($cost, $currency, $this->config->get('config_currency')),
+                /*    'cost' => $this->currency->convert($cost, $currency, $this->config->get('config_currency')),
                     'tax_class_id' => 0,
                     'text' => ' ' . $this->currency->format($this->currency->convert($cost, $currency, $this->session->data['currency']), $this->session->data['currency']),
+                */
+                    'cost'         => $cost,
+                    'tax_class_id' => $this->config->get('omnivalt_tax_class_id'),
+                    'text'         => $this->currency->format($this->tax->calculate($cost, $this->config->get('omnivalt_class_id'), $this->config->get('config_tax')), $this->session->data['currency'])
+            
                 );
             }
             if (!(isset($sub_quote)) || !is_array($sub_quote)) {

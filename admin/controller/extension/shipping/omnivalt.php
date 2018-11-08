@@ -79,7 +79,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
         $sender_array = array('sender_name', 'sender_address', 'sender_phone',
             'sender_postcode', 'sender_city', 'sender_country_code',
             'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee',
-            'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free'
+            'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free', 'tax_class_id'
         );
         foreach ($sender_array as $key) {
             if (isset($this->error[$key])) {
@@ -260,7 +260,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
 		} else {
 			$data['omnivalt_ee_free'] = $this->config->get('omnivalt_ee_free');
 		}
-    
+
 		if (isset($this->request->post['omnivalt_sort_order'])) {
 			$data['omnivalt_sort_order'] = $this->request->post['omnivalt_sort_order'];
 		} else {
@@ -271,6 +271,22 @@ class ControllerExtensionShippingOmnivalt extends Controller
         $data['header'] = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');
         $data['footer'] = $this->load->controller('common/footer');
+
+
+        if (isset($this->request->post['omnivalt_class_id'])) {
+			$data['omnivalt_tax_class_id'] = $this->request->post['omnivalt_tax_class_id'];
+		} else {
+			$data['omnivalt_tax_class_id'] = $this->config->get('omnivalt_tax_class_id');
+    }
+    $data['entry_tax_class'] = "Tax class";
+
+    
+    $this->load->model('localisation/tax_class');
+    $data['tax_classes'] = $this->model_localisation_tax_class->getTaxClasses();
+
+
+
+
         $this->response->setOutput($this->load->view('extension/shipping/omnivalt', $data));
     }
 
@@ -292,7 +308,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $this->error['password'] = $this->language->get('error_password');
         }
 
-        foreach (array('sender_name', 'sender_address', 'sender_phone', 'sender_postcode', 'sender_city', 'sender_country_code', 'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee', 'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free') as $key) {
+        foreach (array('tax_class_id', 'sender_name', 'sender_address', 'sender_phone', 'sender_postcode', 'sender_city', 'sender_country_code', 'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee', 'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free') as $key) {
             if (!$this->request->post['omnivalt_' . $key]) {
                 $this->error[$key] = $this->language->get('error_required');
             }
@@ -1193,7 +1209,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
                 }
 
                 $track_numer = $this->getOrderTrack($order_id);
- 
+
                 if (intval($order['labelsCount']) > count($track_numer) and $track_numer != 0) {
                     $rows = count($track_numer);
                 } else if (intval($order['labelsCount']) <= count($track_numer) and $track_numer != 0) {
