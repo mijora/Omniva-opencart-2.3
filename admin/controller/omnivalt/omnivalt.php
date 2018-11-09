@@ -187,9 +187,18 @@ class ControllerOmnivaltOmnivalt extends Controller
         $id_order = $this->request->get['order_id'];
         $none = null;
         $manifest = -1;
+        
+                $existence = $this->db->query("SELECT * FROM ".DB_PREFIX."order_omniva WHERE id_order = ".$id_order);
+
+        if (count($existence->rows) >= 1)
+         $this->db->query("UPDATE " .DB_PREFIX. "order_omniva SET  manifest = $manifest WHERE id_order=".$id_order );
+        else
+            $this->db->query("INSERT INTO ".DB_PREFIX."order_omniva (tracking, manifest, id_order)
+            VALUES ('$none','$manifest','$id_order')");
+        /*
         $this->db->query("INSERT INTO " . DB_PREFIX . "order_omniva (tracking, manifest, labels, id_order)
             VALUES ('$none','$manifest','$none','$id_order')");
-
+        */
         $this->response->redirect($this->url->link('omnivalt/omnivalt', 'token=' . $this->session->data['token'], true));
 
     }
@@ -202,7 +211,9 @@ class ControllerOmnivaltOmnivalt extends Controller
 
         $id_order = $this->request->get['order_id'];
         $none = null;
-        $this->db->query("DELETE FROM " . DB_PREFIX . "order_omniva WHERE id_order=" . $id_order . " AND manifest=-1;");
+        $this->db->query("UPDATE " .DB_PREFIX. "order_omniva SET  manifest = $manifest WHERE id_order=".$id_order );
+
+        //$this->db->query("DELETE FROM " . DB_PREFIX . "order_omniva WHERE id_order=" . $id_order . " AND manifest=-1;");
 
         $this->response->redirect($this->url->link('omnivalt/omnivalt', 'token=' . $this->session->data['token'], true));
 
