@@ -211,6 +211,7 @@ class ControllerOmnivaltOmnivalt extends Controller
 
         $id_order = $this->request->get['order_id'];
         $none = null;
+        $manifest = null;
         $this->db->query("UPDATE " .DB_PREFIX. "order_omniva SET  manifest = $manifest WHERE id_order=".$id_order );
 
         //$this->db->query("DELETE FROM " . DB_PREFIX . "order_omniva WHERE id_order=" . $id_order . " AND manifest=-1;");
