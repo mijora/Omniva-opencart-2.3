@@ -327,7 +327,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
         $countries = array();
         $countries['LT'] = 1;
         $countries['LV'] = 2;
-        $countries['EE'] = 3;
+        //$countries['EE'] = 3;
         $cabins = $this->parseCSV($csv, $countries);
         if ($cabins) {
             $terminals = $cabins;
