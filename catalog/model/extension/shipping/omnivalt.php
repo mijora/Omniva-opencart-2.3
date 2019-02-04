@@ -113,6 +113,9 @@ class ModelExtensionShippingOmnivalt extends Model
                         );
                     }
                     $cabine_select .= '</select>';
+                    $cabine_select .= '
+                    <button type="button" id="show-omniva-map" class="btn btn-basic btn-sm omniva-btn"><i id="show-omniva-map" class="fa fa-map-marker-alt fa-lg" aria-hidden="true"></i></button>
+                    ';
                 }
 
                 $code = "omnivalt";
