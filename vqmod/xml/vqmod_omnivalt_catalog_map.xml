@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <id>Catalog checkout variables for map</id>
+    <version>1.0.0</version>
+    <vqmver required="true">2.5.0</vqmver>
+    <author></author>
+        <file path="catalog/view/theme/default/template/d_quickcheckout/shipping_method.tpl" error="log">
+    <operation error="log">
+        <search><![CDATA[<% _.each(shipping_method.quote, function(quote) { %>]]></search>
+        <add position="after"><![CDATA[kuku      
+        <%]]> 
+        </add>
+    </operation>
+  </file>
+    <file path="catalog/view/theme/*/template/common/header.tpl" error="log">
+     <operation>
+        <search><![CDATA[</head>]]></search>
+            <add position="ibefore"><![CDATA[   
+            <script>var locations = <?php echo json_encode($locations);?>;</script>
+            <link rel="stylesheet" href="https://js.arcgis.com/4.10/esri/css/main.css">
+            <script defer src="https://js.arcgis.com/4.10/"></script>
+            <link href="catalog/view/javascript/omnivacss.css" rel="stylesheet">
+            <link href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" rel="stylesheet">
+            <script defer src="catalog/view/javascript/omnivaMap.js" type="text/javascript"></script>
+        ]]></add>
+    </operation>
+    <operation>
+        <search><![CDATA[</header>]]></search>
+        <add position="iafter"><![CDATA[<?=$omnivaModal;?>]]></add>
+    </operation>
+  </file>
+  <file path="catalog/controller/common/header.php">
+    <operation>
+        <search><![CDATA[public function index() {]]></search>
+        <add position="ibefore"> <![CDATA[
+            private function getTerminalForMap($selected = '',$country = "LT")
+                {
+
+                    $terminals_json_file_dir = DIR_DOWNLOAD."/locations.json";
+                    $terminals_file = fopen($terminals_json_file_dir, "r");
+                    $terminals = fread($terminals_file,filesize($terminals_json_file_dir)+10);
+                    fclose($terminals_file);
+                    $terminals = json_decode($terminals,true);
+
+                $parcel_terminals = '';
+            
+                if (is_array($terminals)){
+                    $terminalsList = array();
+                    foreach ($terminals as $terminal){
+                    if ($terminal['A0_NAME'] != $country && in_array($country,array("LT","EE","LV")) || intval($terminal['TYPE']) == 1)
+                        continue;
+            
+                    if (!isset($grouped_options[$terminal['A1_NAME']]))
+                        $grouped_options[(string)$terminal['A1_NAME']] = array();
+                    $grouped_options[(string)$terminal['A1_NAME']][(string)$terminal['ZIP']] = $terminal['NAME'];
+                    
+                    $terminalsList[] = [$terminal['NAME'], $terminal['Y_COORDINATE'], $terminal['X_COORDINATE'], $terminal['ZIP'], $terminal['A1_NAME'], $terminal['A2_NAME'], $terminal['comment_lit']];
+                    }
+                }
+                return $terminalsList;
+                }
+            private function terminalsModal() {
+                return '
+                <div id="omnivaLtModal" class="modal">
+                    <div class="omniva-modal-content">
+                        <div class="omniva-modal-header">
+                        <span class="close" id="terminalsModal">&times;</span>
+                        <h5 style="display: inline">Omniva paštomatai</h5>
+                        </div>
+                        <div class="omniva-modal-body" style="/*overflow: hidden;*/">
+                            <div id="map-omniva-terminals">
+                            </div>
+                            <div class="omniva-search-bar" >
+                                <h3 style="margin-top: 0px;">Paštomatų adresai</h3>
+                                <div id="omniva-search"></div>
+                                <div class="found_terminals scrollbar" id="style-8"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>';
+            }
+        ]]></add>
+    </operation>
+    <operation>
+        <search><![CDATA[return $this->load->view('common/header', $data);]]></search>
+        <add position="ibefore"><![CDATA[
+            $data['locations']=$this->getTerminalForMap();
+            $data['omnivaModal']=$this->terminalsModal();
+        ]]></add>
+    </operation>
+  </file>
+</modification>
