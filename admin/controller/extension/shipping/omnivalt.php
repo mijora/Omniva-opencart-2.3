@@ -334,6 +334,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
         }
 
         $this->model_setting_setting->editSetting('omnivalt_terminals', array('omnivalt_terminals_LT' => $terminals));
+        $this->csvTerminal();
     }
 
     private function fetchURL($url)
@@ -353,6 +354,23 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
         curl_close($ch);
         return $out;
+    }
+
+    public function csvTerminal() {
+        
+        $url = 'https://www.omniva.ee/locations.json';
+        $fp = fopen(DIR_DOWNLOAD."locations.json", "w");
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_FILE, $fp);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 60);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        $data = curl_exec($curl);
+        curl_close($curl);
+        fclose($fp);
     }
 
     private function parseCSV($csv, $countries = array())

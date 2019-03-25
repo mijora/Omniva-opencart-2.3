@@ -36,7 +36,7 @@
             private function getTerminalForMap($selected = '',$country = "LT")
                 {
 
-                    $terminals_json_file_dir = DIR_DOWNLOAD."/locations.json";
+                    $terminals_json_file_dir = DIR_DOWNLOAD."locations.json";
                     $terminals_file = fopen($terminals_json_file_dir, "r");
                     $terminals = fread($terminals_file,filesize($terminals_json_file_dir)+10);
                     fclose($terminals_file);
