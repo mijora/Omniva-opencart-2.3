@@ -33,6 +33,24 @@ class ControllerExtensionModuleOmnivalt extends Controller
         $this->db->query("UPDATE " . DB_PREFIX . "setting
          SET `value` = '" . $this->db->escape(json_encode($terminals)) . "', serialized = '1'
          WHERE `key` = '" . $this->db->escape($key) . "'");
+         $this->csvTerminal();
+    }
+    
+    public function csvTerminal() {
+        
+        $url = 'https://www.omniva.ee/locations.json';
+        $fp = fopen(DIR_DOWNLOAD."locations.json", "w");
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_FILE, $fp);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 60);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        $data = curl_exec($curl);
+        curl_close($curl);
+        fclose($fp);
     }
 
     private function fetchURL($url)
