@@ -17,6 +17,7 @@
         <search><![CDATA[</head>]]></search>
             <add position="ibefore"><![CDATA[   
             <script>var locations = <?php echo json_encode($locations);?>;</script>
+            <script>var select_terminals = "<?= $select_om_teminal;?>"; var stateForMap = "<?= $stateForMap;?>";</script>
             <link rel="stylesheet" href="https://js.arcgis.com/4.10/esri/css/main.css">
             <script defer src="https://js.arcgis.com/4.10/"></script>
             <link href="catalog/view/javascript/omnivacss.css" rel="stylesheet">
@@ -35,8 +36,13 @@
         <add position="ibefore"> <![CDATA[
             private function getTerminalForMap($selected = '',$country = "LT")
                 {
+            $langs = $this->session->data['language'];
+            if (strpos($langs, 'lv') !== false)
+              $country = 'LV';
+            else if (strpos($langs, 'ee') !== false)
+                $country = 'EE';
 
-                    $terminals_json_file_dir = DIR_DOWNLOAD."locations.json";
+                    $terminals_json_file_dir = DIR_DOWNLOAD."/locations.json";
                     $terminals_file = fopen($terminals_json_file_dir, "r");
                     $terminals = fread($terminals_file,filesize($terminals_json_file_dir)+10);
                     fclose($terminals_file);
@@ -60,18 +66,22 @@
                 return $terminalsList;
                 }
             private function terminalsModal() {
+                        $this->load->language('extension/shipping/omnivalt');
+            $head = $this->language->get('text_omniva_map_head');
+            $addresses = $this->language->get('text_omniva_terminal_address');
+
                 return '
                 <div id="omnivaLtModal" class="modal">
                     <div class="omniva-modal-content">
                         <div class="omniva-modal-header">
                         <span class="close" id="terminalsModal">&times;</span>
-                        <h5 style="display: inline">Omniva paštomatai</h5>
+                        <h5 style="display: inline">'.$head.'</h5>
                         </div>
                         <div class="omniva-modal-body" style="/*overflow: hidden;*/">
                             <div id="map-omniva-terminals">
                             </div>
                             <div class="omniva-search-bar" >
-                                <h3 style="margin-top: 0px;">Paštomatų adresai</h3>
+                                <h3 style="margin-top: 0px;">'.$addresses.'</h3>
                                 <div id="omniva-search"></div>
                                 <div class="found_terminals scrollbar" id="style-8"></div>
                             </div>
@@ -84,6 +94,9 @@
     <operation>
         <search><![CDATA[return $this->load->view('common/header', $data);]]></search>
         <add position="ibefore"><![CDATA[
+            $this->load->language('extension/shipping/omnivalt');
+            $data['select_om_teminal'] = $this->language->get('text_select_omn_terminal');
+            $data['stateForMap'] = $this->session->data['language'];
             $data['locations']=$this->getTerminalForMap();
             $data['omnivaModal']=$this->terminalsModal();
         ]]></add>

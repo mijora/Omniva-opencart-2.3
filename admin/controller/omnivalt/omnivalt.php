@@ -117,6 +117,17 @@ class ControllerOmnivaltOmnivalt extends Controller
         $data['text_courier'] = $this->language->get('text_courier');
         $data['generate_label'] = $this->language->get('generate_label');
 
+        $data['text_courier_call'] = $this->language->get('text_courier_call');
+        $data['text_omniva_important'] = $this->language->get('text_omniva_important');
+        $data['text_latest_courier_call'] = $this->language->get('text_latest_courier_call');
+        $data['text_eshop_settings'] = $this->language->get('text_eshop_settings');
+        $data['text_eshop_settings_p'] = $this->language->get('text_eshop_settings_p');
+        $data['text_omniva_data_send'] = $this->language->get('text_omniva_data_send');
+        $data['entry_sender_name'] = $this->language->get('entry_sender_name');
+        $data['entry_sender_phone'] = $this->language->get('entry_sender_phone');
+        $data['entry_sender_address'] = $this->language->get('entry_sender_address');
+        $data['entry_sender_postcode'] = $this->language->get('entry_sender_postcode');
+        $data['button_save'] = $this->language->get('button_save');
         $this->response->setOutput($this->load->view('omnivalt/omnivalt', $data));
     }
 

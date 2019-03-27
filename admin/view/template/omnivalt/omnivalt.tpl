@@ -244,30 +244,23 @@ $newPage = true;
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Baigiamoji siunta, kurjerio iškvietimas.</h4>
+        <h4 class="modal-title"><?= $text_courier_call; ?></h4>
       </div>
       <div class="modal-body">
             <div class="alert alert-info">
-                    <strong>Svarbu!</strong> Vėliausias galimas kurjerio iškvietimas yra iki 15val. Vėliau iškvietus kurjerį negarantuojame, jog siunta bus paimta.
+                    <strong><?= $text_omniva_important; ?></strong> <?= $text_latest_courier_call;?>
                     <br />
-                    <strong>El-parduotuvės adreso nustatymus</strong>  galima keisti Omnivalt modulio nustatymuose.
+                    <strong><?= $text_eshop_settings;?></strong> <?= $text_eshop_settings_p;?>
             </div>
-            <h4>Siunčiami duomenys<h4>
-            <b>Siuntėjas:</b> <?= $sender;?><br>
-            <b>Telefonas:</b> <?= $phone;?><br>
-            <b>Pašto kodas:</b> <?= $postcode;?><br>
-            <b>Adresas:</b> <?= $address;?><br>
-            <!--
-            <div class="form-group">
-                <label class="control-label col-sm-3" for="email"> Tema (neprivaloma)</label>
-                <div class="col-sm-9">
-                <input type="text" name="commentOmnivalt" class="form-control" id="email" placeholder="komentaras" value="informacija apie naujas siuntas">
-                </div>
-            </div>-->
+            <h4><?= $text_omniva_data_send;?><h4>
+            <b><?=$entry_sender_name;?>:</b> <?= $sender;?><br>
+            <b><?=$entry_sender_phone;?>:</b> <?= $phone;?><br>
+            <b><?=$entry_sender_postcode;?>:</b> <?= $postcode;?><br>
+            <b><?=$entry_sender_address;?>:</b> <?= $address;?><br>
       </div>
       <div class="modal-footer">
-            <button type="submit"  id="requestOmnivaltQourier" class="btn btn-default">Siųsti</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Atšaukti</button>
+            <button type="submit"  id="requestOmnivaltQourier" class="btn btn-default"><?=$button_save;?></button>
+            <button type="button" class="btn btn-default" data-dismiss="modal"><?=$button_cancel;?></button>
       </div>
     </form>
     </div>
@@ -343,7 +336,7 @@ $(document).ready(function() {
             </tr>");
         }
         if(data.length<1)
-            $('#searchTable').append("<tr><td colspan='6'>Pagal pateiktus duomenis nieko nera.</td>");   
+            $('#searchTable').append("<tr><td colspan='6'>...</td>");   
 		},
     		error: function(xhr, ajaxOptions, thrownError) {
 			/* alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);*/

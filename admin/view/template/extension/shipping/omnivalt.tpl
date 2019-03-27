@@ -324,13 +324,10 @@
                         <?php echo (isset($omnivalt_terminals['omnivalt_terminals_LT'])?count($omnivalt_terminals['omnivalt_terminals_LT']):0); ?>
                     </div>
                   </div>
-                                  <div class="form-group">
+                  <div class="form-group">
                     <label class="col-sm-2 control-label" for="terminals"><?=$cron_url;?></label>
                     <div class="col-sm-10" id="terminals">
                     <a href="<?php print HTTPS_CATALOG; ?>index.php?route=extension/module/omnivalt"/><?php print HTTPS_CATALOG; ?>index.php?route=extension/module/omnivalt</a><br />
-                    Nuoroda galima naudoti automatiniam omnivalt terminalų atnaujinimui naudojant local serverio crontab funkcijas. 
-                    Arba jei tokios nėra - https://cron-job.org/en/ ir panašius servisus.
-                    </div>
             </div>
         </form>
       </div>

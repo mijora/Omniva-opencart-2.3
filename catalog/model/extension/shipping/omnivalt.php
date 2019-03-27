@@ -88,6 +88,7 @@ class ModelExtensionShippingOmnivalt extends Model
                         $sub_quote['parcel_terminal_' . $cabin[3]] = array(
                             'code' => 'omnivalt.parcel_terminal_' . $cabin[3],
                             'title' => '<div class="omniva_terminal_opt">'.$title . ': ' . $cabin[0] . ' ' . $cabin[2].'</div>',
+                            'head'  => $title,
                             'cost'         => $cost,
                             'tax_class_id' => $this->config->get('omnivalt_tax_class_id'),
                             'text'         => $this->currency->format($this->tax->calculate($cost, $this->config->get('omnivalt_class_id'), $this->config->get('config_tax')), $this->session->data['currency'])    

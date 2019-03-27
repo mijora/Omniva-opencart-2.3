@@ -7,7 +7,7 @@
         <file path="catalog/view/theme/*/template/d_quickcheckout/shipping_method.twig" error="log">
     <operation error="log">>
         <search><![CDATA[<% _.each(shipping_method.quote, function(quote) { %>]]></search>
-        <add position="after"><![CDATA[kukuk
+        <add position="after"><![CDATA[
          <%   if (quote.code == 'fake.parcel_terminal' || quote.code == 'omnivalt.parcel_terminal') { %>
 	<% if (quote.code.substring(0, 15) == 'omnivalt.parcel'){return; alert(quote.code.substring(0, 15) );} %>
     
@@ -26,7 +26,7 @@
 
 			<span class="text">
 			<% $( "input[name=shipping_method]" ).focus(function() { $( this ).blur(); });%>
-				Omniva terminalas
+				<%= quote.head %>
 				<select name="omnivalt_parcel_terminal" id="omnivalt_parcel_terminal" class="form-control form-inline input-sm" style="width: 70%; display: inline;"
 				onchange="$('#omnivalt_parcel_terminal').parent().parent().find('input').eq(0).prop('checked',true).val($(this).val());" 
 				>
