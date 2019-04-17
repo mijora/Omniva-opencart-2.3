@@ -4,6 +4,7 @@
  *
  * As well saving its history for futher review
  */
+ini_set('display_errors', 1);
 class ControllerOmnivaltOmnivalt extends Controller
 {
     public function index()
@@ -223,6 +224,8 @@ class ControllerOmnivaltOmnivalt extends Controller
         $id_order = $this->request->get['order_id'];
         $none = null;
         $manifest = null;
+        $manifest = intval($this->config->get('omniva_manifest'));
+        if (!$manifest) $manifest = 0;
         $this->db->query("UPDATE " .DB_PREFIX. "order_omniva SET  manifest = $manifest WHERE id_order=".$id_order );
 
         //$this->db->query("DELETE FROM " . DB_PREFIX . "order_omniva WHERE id_order=" . $id_order . " AND manifest=-1;");
