@@ -1228,9 +1228,9 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
                 $track_numer = $this->getOrderTrack($order_id);
 
-                if (intval($order['labelsCount']) > count($track_numer) and $track_numer != 0) {
+                if ($track_numer and intval($order['labelsCount']) > count($track_numer) and $track_numer != 0) {
                     $rows = count($track_numer);
-                } else if (intval($order['labelsCount']) <= count($track_numer) and $track_numer != 0) {
+                } else if ($track_numer and intval($order['labelsCount']) <= count($track_numer) and $track_numer != 0) {
                     $rows = $order['labelsCount'];
                 } else {
                     print 'Please generate labels first';
