@@ -16,7 +16,7 @@
             <search position="iafter"><![CDATA[<?php echo $order['customer']; ?>]]></search>
             <add><![CDATA[
             <?php if(substr($order["shipping_code"],0, 8) == 'omnivalt' ) {?>
-            <img src="/admin/view/image/omniva-lt.png" alt="Omniva LT" height="20">
+            <img src="./view/image/omniva-lt.png" alt="Omniva LT" height="20">
                 <?php } ?>
             ]]></add>
         </operation>

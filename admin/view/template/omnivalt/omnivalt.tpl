@@ -58,7 +58,7 @@ echo $header, $column_left;
                <?php
         $variable = json_decode($nOrder['tracking']);
         $numb = intval($nOrder['labelscount']);
-        if($numb > count($variable))
+        if($variable != null and $numb > count($variable))
             $numb = count($variable);
         for($i=0; $i<$numb; $i++) {
             echo $variable[$i].'<br>';

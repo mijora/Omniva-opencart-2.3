@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <id>Catalog checkout variables for map</id>
+    <version>1.0.0</version>
+    <vqmver required="true">2.5.0</vqmver>
+    <author></author>
+    <file path="catalog/view/theme/*/template/checkout/shipping_method.tpl" error="log">
+    <operation>
+        <search><![CDATA[<?php foreach ($shipping_methods as $shipping_method) { ?>]]></search>
+        <add position="replace"><![CDATA[<?php foreach ($shipping_methods as $key => $shipping_method) { ?>]]></add>
+    </operation>
+    <operation>
+        <search><![CDATA[<p><strong><?php echo $shipping_method['title']; ?></strong></p>]]></search>
+        <add position="before"><![CDATA[
+        <?php if ($key == "omnivalt"): ?>
+        <script>
+        $(document).ready(function () {
+      var omnivaModuleReady = false;
+      $(document).on('click', 'input[type="radio"][name="shipping_method"]', function (e) {
+        if ($(this).val() === 'fake.parcel_terminal' && !omnivaModuleReady) {
+            omnivaModuleReady = $(this).omniva({
+                terminals: locations,
+                country_code: country_code,
+                path_to_img: 'image/omniva/',
+                callback: function (id) {
+                  omnivaModuleReady.val('omnivalt.parcel_terminal_' + id);
+                },
+                translate: omniva_map_translation
+            });
+            omnivaModuleReady.trigger('omniva.show');
+
+            // with default template this should be enough even if user changes postcode (as he needs to press continue button)
+            var sameShipping = $('input[name="shipping_address"]');
+            if (sameShipping.length > 0 && sameShipping.is(':checked')) {
+                omnivaModuleReady.trigger('omniva.postcode', [$('#input-payment-postcode').val()]);
+            } else {
+                omnivaModuleReady.trigger('omniva.postcode', [$('#input-shipping-postcode').val()]);
+            }
+        } else {
+            if (omnivaModuleReady) {
+              if ($(this).is(omnivaModuleReady)) {
+                  omnivaModuleReady.trigger('omniva.show');
+              } else {
+                  omnivaModuleReady.trigger('omniva.hide');
+              }
+            }
+        }
+      });
+    });
+    </script>
+    <?php endif; ?>
+        ]]></add>
+    </operation>
+  </file>
+  <file path="catalog/controller/checkout/shipping_method.php" error="log">
+    <operation>
+        <search><![CDATA[$this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]]]]></search>
+        <add position="replace"><![CDATA[
+        $shipping_method
+        ]]></add>
+    </operation>
+    <operation>
+        <search><![CDATA[$shipping = explode('.', $this->request->post['shipping_method']);]]></search>
+        <add position="iafter"><![CDATA[
+        // custom for omniva
+				if ($shipping[0] === 'omnivalt'){
+					if (strpos($shipping[1], 'parcel_terminal_') > -1) {
+						$terminal_code = explode('parcel_terminal_', $shipping[1]);
+						if(isset($this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal']['terminals'][$terminal_code[1]])){
+							$method = $this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal'];
+							$method['code'] = $this->request->post['shipping_method'];
+							$method['title'] = $this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal']['terminals'][$terminal_code[1]];
+							$method['terminals'] = null;
+              $shipping_method = $method;
+						} 
+					} else { // courier
+						$shipping_method = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
+					}
+				} else {
+          $shipping_method = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
+        }
+        ]]></add>
+    </operation>
+  </file>
+</modification>
