@@ -7,12 +7,8 @@
     <file path="catalog/view/theme/*/template/checkout/shipping_method.tpl" error="log">
     <operation>
         <search><![CDATA[<?php foreach ($shipping_methods as $shipping_method) { ?>]]></search>
-        <add position="replace"><![CDATA[<?php foreach ($shipping_methods as $key => $shipping_method) { ?>]]></add>
-    </operation>
-    <operation>
-        <search><![CDATA[<p><strong><?php echo $shipping_method['title']; ?></strong></p>]]></search>
-        <add position="before"><![CDATA[
-        <?php if ($key == "omnivalt"): ?>
+        <add position="iafter"><![CDATA[
+        <?php if ($shipping_method["title"] == "Omniva lt"): ?>
         <script>
         $(document).ready(function () {
       var omnivaModuleReady = false;
@@ -72,9 +68,7 @@
 							$method['title'] = $this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal']['terminals'][$terminal_code[1]];
 							$method['terminals'] = null;
               $shipping_method = $method;
-						} 
-					} else { // courier
-						$shipping_method = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
+						}
 					}
 				} else {
           $shipping_method = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
