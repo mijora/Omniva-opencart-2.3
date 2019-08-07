@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <id>Admin order list buttons</id>
+    <version>1.0.0</version>
+    <vqmver required="true">2.5.0</vqmver>
+    <author></author>
+    <file name="admin/view/template/sale/order_form.tpl">
+      <operation>
+        <search position="iafter"><![CDATA[html += '<option value="' + json['shipping_methods'][i]['quote'][j]['code'] + '">' + json['shipping_methods'][i]['quote'][j]['title'] + ' - ' + json['shipping_methods'][i]['quote'][j]['text'] + '</option>';]]></search>
+            <add><![CDATA[
+                }
+            ]]></add>
+     </operation>       
+     <operation>
+          <search position="iafter"><![CDATA[if (!json['shipping_methods'][i]['error']) {]]></search>
+            <add><![CDATA[
+                if (i === 'omnivalt') {
+											var selected_code = $('select[name=\'shipping_method\'] option:selected').val();
+											for (j in json['shipping_methods'][i]['quote']) {
+												switch (j) {
+													case 'courier':
+														if (json['shipping_methods'][i]['quote'][j]['code'] == selected_code) {
+															html += '<option value="' + json['shipping_methods'][i]['quote'][j]['code'] + '" selected="selected">' + json['shipping_methods'][i]['title'] + ' ' + json['shipping_methods'][i]['quote'][j]['title'] + ' - ' + json['shipping_methods'][i]['quote'][j]['text'] + '</option>';
+														} else {
+															html += '<option value="' + json['shipping_methods'][i]['quote'][j]['code'] + '">' + json['shipping_methods'][i]['title'] + ' ' + json['shipping_methods'][i]['quote'][j]['title'] + ' - ' + json['shipping_methods'][i]['quote'][j]['text'] + '</option>';
+														}
+														break;
+													case 'parcel_terminal':
+														for (terminal in json['shipping_methods'][i]['quote'][j]['terminals']) {
+															var terminal_code = 'omnivalt.parcel_terminal_' + terminal;
+															if (terminal_code == selected_code) {
+																html += '<option value="' + terminal_code + '" selected="selected">' + json['shipping_methods'][i]['quote'][j]['terminals'][terminal] + ' - ' + json['shipping_methods'][i]['quote'][j]['text'] + '</option>';
+															} else {
+																html += '<option value="' + terminal_code + '">' + json['shipping_methods'][i]['quote'][j]['terminals'][terminal] + ' - ' + json['shipping_methods'][i]['quote'][j]['text'] + '</option>';
+															}
+														}
+														break;
+												}
+											}
+										} else {
+        ]]></add>
+      </operation>
+    </file>
+</modification>
