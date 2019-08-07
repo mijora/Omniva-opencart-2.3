@@ -123,7 +123,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $data['omnivalt_url'] = $this->config->get('omnivalt_url');
         }
         if ($data['omnivalt_url'] == '') {
-            $data['omnivalt_url'] = 'https://217.159.234.93';
+            $data['omnivalt_url'] = 'https://edixml.post.ee';
         }
 
         if (isset($this->request->post['omnivalt_user'])) {
