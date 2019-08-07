@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <id>Catalog checkout variables for map</id>
+    <version>1.0.0</version>
+    <vqmver required="true">2.5.0</vqmver>
+    <author></author>
+    /usr/local/var/www/public/opencart20/catalog/controller/api/shipping.php
+    <file path="catalog/controller/api/shipping.php" error="log">
+    <operation>
+        <search><![CDATA[class ControllerApiShipping extends Controller {]]></search>
+        <add position="after"><![CDATA[
+        private function omnivaShippingMethod($carrier='', $code='') {
+          if(isset($this->session->data['shipping_methods']) && isset($this->session->data['shipping_methods'][$carrier])){
+				
+				    // custom for omniva
+				    if ($carrier === 'omnivalt'){
+					    if (strpos($code, 'parcel_terminal_') > -1) {
+						    $terminal_code = explode('parcel_terminal_', $code);
+						    if(isset($this->session->data['shipping_methods'][$carrier]['quote']['parcel_terminal']['terminals'][$terminal_code[1]])){
+							    $method = $this->session->data['shipping_methods'][$carrier]['quote']['parcel_terminal'];
+							    $method['code'] = $carrier . '.' . $code;
+							    $method['title'] = $this->session->data['shipping_methods'][$carrier]['quote']['parcel_terminal']['terminals'][$terminal_code[1]];
+							    $method['terminals'] = null;
+							    return $method;
+						    }
+					    }
+				    }
+            // omnivalt.carrier is accessible as usual
+				    if(isset($this->session->data['shipping_methods'][$carrier]['quote'][$code])){
+					    return $this->session->data['shipping_methods'][$carrier]['quote'][$code];
+				    }
+			    }
+
+          return false;
+        }
+        ]]></add>
+    </operation>
+    
+    <operation>
+			<search><![CDATA[isset($this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]])]]></search>
+			<add position="replace"><![CDATA[$this->omnivaShippingMethod($shipping[0], $shipping[1])]]></add>
+		</operation>
+
+    <operation>
+			<search><![CDATA[$this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]]]]></search>
+			<add position="replace"><![CDATA[$this->omnivaShippingMethod($shipping[0], $shipping[1])]]></add>
+		</operation>
+  </file>
+</modification>
