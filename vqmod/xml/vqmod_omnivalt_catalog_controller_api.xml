@@ -4,7 +4,6 @@
     <version>1.0.0</version>
     <vqmver required="true">2.5.0</vqmver>
     <author></author>
-    /usr/local/var/www/public/opencart20/catalog/controller/api/shipping.php
     <file path="catalog/controller/api/shipping.php" error="log">
     <operation>
         <search><![CDATA[class ControllerApiShipping extends Controller {]]></search>
