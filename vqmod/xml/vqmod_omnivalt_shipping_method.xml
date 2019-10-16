@@ -7,21 +7,22 @@
     <file path="catalog/view/theme/*/template/checkout/shipping_method.tpl" error="log">
     <operation>
         <search><![CDATA[<?php foreach ($shipping_methods as $shipping_method) { ?>]]></search>
-        <add position="iafter"><![CDATA[
-        <?php if ($shipping_method["title"] == "Omniva lt"): ?>
+        <add position="replace"><![CDATA[
+        <?php foreach ($shipping_methods as $key => $shipping_method) { ?>
+        <?php if ($key == "omnivalt"): ?>
         <script>
         $(document).ready(function () {
       var omnivaModuleReady = false;
       $(document).on('click', 'input[type="radio"][name="shipping_method"]', function (e) {
         if ($(this).val() === 'fake.parcel_terminal' && !omnivaModuleReady) {
             omnivaModuleReady = $(this).omniva({
-                terminals: locations,
-                country_code: country_code,
+                country_code: '<?php echo $omni_country_code;?>',
                 path_to_img: 'image/omniva/',
                 callback: function (id) {
                   omnivaModuleReady.val('omnivalt.parcel_terminal_' + id);
                 },
-                translate: omniva_map_translation
+                translate: omniva_map_translation,
+                terminals: <?php echo json_encode($omni_terminals);?>,
             });
             omnivaModuleReady.trigger('omniva.show');
 
@@ -42,6 +43,15 @@
             }
         }
       });
+      $('input[type="radio"][name="shipping_method"]:checked').click();
+      $('#button-shipping-method').on('click', function (e) {
+        var $selectedOption = $('input[type="radio"][name="shipping_method"]:checked');
+        if ($($selectedOption).val().includes('fake.parcel')) {
+          e.preventDefault();
+          e.stopPropagation();
+          alert(omniva_map_translation.terminal_not_selected);
+        }
+      });
     });
     </script>
     <?php endif; ?>
@@ -53,6 +63,52 @@
         <search><![CDATA[$this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]]]]></search>
         <add position="replace"><![CDATA[
         $shipping_method
+        ]]></add>
+    </operation>
+    <operation>
+        <search><![CDATA[$this->response->setOutput($this->load->view('checkout/shipping_method', $data));]]></search>
+        <add position="before"><![CDATA[
+        $data['omni_terminals'] = $this->getTerminalForMap();
+		    $data['omni_country_code'] = $this->getCountryForMap();
+        ]]></add>
+    </operation>
+    <operation>
+        <search><![CDATA[public function save() {]]></search>
+        <add position="before"><![CDATA[
+          private function getCountryForMap($country = "LT")
+          {
+            if (isset($this->session->data['shipping_address']['iso_code_2']))
+							return $this->session->data['shipping_address']['iso_code_2'];
+						return $country;
+          }
+
+          private function getTerminalForMap($selected = '', $country = "LT")
+          {
+            $country = $this->getCountryForMap($country);
+
+            $terminals_json_file_dir = DIR_DOWNLOAD."/locations.json";
+            $terminals_file = fopen($terminals_json_file_dir, "r");
+            $terminals = fread($terminals_file,filesize($terminals_json_file_dir)+10);
+            fclose($terminals_file);
+            $terminals = json_decode($terminals,true);
+
+            $parcel_terminals = '';
+        
+            if (is_array($terminals)){
+              $terminalsList = array();
+              foreach ($terminals as $terminal){
+              if ($terminal['A0_NAME'] != $country && in_array($country,array("LT","EE","LV")) || intval($terminal['TYPE']) == 1)
+                continue;
+      
+              if (!isset($grouped_options[$terminal['A1_NAME']]))
+                $grouped_options[(string)$terminal['A1_NAME']] = array();
+              $grouped_options[(string)$terminal['A1_NAME']][(string)$terminal['ZIP']] = $terminal['NAME'];
+              
+              $terminalsList[] = [$terminal['NAME'], $terminal['Y_COORDINATE'], $terminal['X_COORDINATE'], $terminal['ZIP'], $terminal['A1_NAME'], $terminal['A2_NAME'], $terminal['comment_lit']];
+              }
+            }
+            return $terminalsList;
+          }
         ]]></add>
     </operation>
     <operation>

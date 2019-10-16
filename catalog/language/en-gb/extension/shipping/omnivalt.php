@@ -13,3 +13,4 @@ $_['text_omniva_show_map']          = 'Show in map';
 $_['text_omniva_show_more']         = 'Show more';
 $_['text_omniva_not_found']         = 'Place not found';
 $_['text_omniva_back_to_list']      = 'Back to list';
+$_['text_omniva_no_terminal']       = 'Please select parcel terminal';
