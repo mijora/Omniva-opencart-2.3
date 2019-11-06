@@ -14,4 +14,4 @@ $_['text_omniva_show_map']         = 'Žiūrėti žemėlapyje';
 $_['text_omniva_show_more']        = 'Rodyti daugiau';
 $_['text_omniva_not_found']        = 'Vieta nerasta';
 $_['text_omniva_back_to_list']     = 'Grįžti į sąrašą';
-
+$_['text_omniva_no_terminal']      = 'Pasirinkite paštomatą!';

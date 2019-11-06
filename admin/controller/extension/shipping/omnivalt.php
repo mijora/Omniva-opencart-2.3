@@ -331,9 +331,11 @@ class ControllerExtensionShippingOmnivalt extends Controller
         $cabins = $this->parseCSV($csv, $countries);
         if ($cabins) {
             $terminals = $cabins;
+            $fp = fopen(DIR_DOWNLOAD."omniva_terminals.json", "w");
+            fwrite($fp, json_encode($terminals));
+            fclose($fp);
         }
 
-        $this->model_setting_setting->editSetting('omnivalt_terminals', array('omnivalt_terminals_LT' => $terminals));
         $this->csvTerminal();
     }
 

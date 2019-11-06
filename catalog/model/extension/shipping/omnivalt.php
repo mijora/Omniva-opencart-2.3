@@ -61,7 +61,7 @@ class ModelExtensionShippingOmnivalt extends Model
           $codeCarrier = 'fake';
         }
         if ($codeCarrier == 'fake') {
-          $cabins = $this->config->get('omnivalt_terminals_LT');
+          $cabins = $this->loadTerminals();
           $terminals = $this->groupTerminals($cabins, $address['iso_code_2']);
         } else { // courier doesnt need terminals
           $terminals = null;
@@ -92,6 +92,20 @@ class ModelExtensionShippingOmnivalt extends Model
       );
     }
     return $method_data;
+  }
+
+  private function loadTerminals()
+  {
+    $terminals_json_file_dir = DIR_DOWNLOAD."omniva_terminals.json";
+    if (!file_exists($terminals_json_file_dir))
+      return false;
+    $terminals_file = fopen($terminals_json_file_dir, "r");
+    if (!$terminals_file)
+      return false;
+    $terminals = fread($terminals_file, filesize($terminals_json_file_dir) + 10);
+    fclose($terminals_file);
+    $terminals = json_decode($terminals, true);
+    return $terminals;
   }
 
   private function groupTerminals($terminals, $country = 'LT', $selected = '')

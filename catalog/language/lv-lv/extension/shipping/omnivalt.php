@@ -13,3 +13,4 @@ $_['text_omniva_show_map']          = 'Apskatīt novietojumu';
 $_['text_omniva_show_more']         = 'Parādīt vairāk';
 $_['text_omniva_not_found']         = 'Vieta nav atrasta';
 $_['text_omniva_back_to_list']      = 'Atpakaļ';
+$_['text_omniva_no_terminal']       = 'Lūdzu, izvēlieties pakomātu!';

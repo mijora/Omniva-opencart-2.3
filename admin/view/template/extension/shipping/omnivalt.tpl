@@ -321,7 +321,7 @@
           <div class="form-group">
                     <label class="col-sm-2 control-label" for="terminals"><?php echo $entry_terminals; ?></label>
                     <div class="col-sm-10" id="terminals">
-                        <?php echo (isset($omnivalt_terminals['omnivalt_terminals_LT'])?count($omnivalt_terminals['omnivalt_terminals_LT']):0); ?>
+                        <?php echo (isset($omnivalt_terminals)?count($omnivalt_terminals):0); ?>
                     </div>
                   </div>
                   <div class="form-group">

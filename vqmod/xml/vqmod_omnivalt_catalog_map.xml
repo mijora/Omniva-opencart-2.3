@@ -17,11 +17,8 @@
         <search><![CDATA[</head>]]></search>
             <add position="ibefore"><![CDATA[   
             <script>
-                var country_code = "<?= $country_code; ?>";
                 var omniva_map_translation = <?= json_encode($omniva_map_translation); ?>;
-                var locations = <?php echo json_encode($locations);?>;
             </script>
-            <script>var select_terminals = "<?= $select_om_teminal;?>"; var stateForMap = "<?= $stateForMap;?>";</script>
             <link href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" rel="stylesheet">
             <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
             <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
@@ -29,91 +26,23 @@
             <link href="catalog/view/javascript/omniva-map.css" rel="stylesheet">
         ]]></add>
     </operation>
-    <operation>
-        <search><![CDATA[</header>]]></search>
-        <add position="iafter"><![CDATA[<?=$omnivaModal;?>]]></add>
-    </operation>
   </file>
   <file path="catalog/controller/common/header.php">
     <operation>
         <search><![CDATA[public function index() {]]></search>
         <add position="ibefore"> <![CDATA[
-            private function getCountryForMap($country = "LT") {
-                $langs = $this->session->data['language'];
-                if (strpos($langs, 'lv') !== false)
-                    $country = 'LV';
-                else if (strpos($langs, 'ee') !== false)
-                    $country = 'EE';
-                return $country;
-            }
-            private function getTerminalForMap($selected = '',$country = "LT")
-                {
-            $langs = $this->session->data['language'];
-            if (strpos($langs, 'lv') !== false)
-              $country = 'LV';
-            else if (strpos($langs, 'ee') !== false)
-                $country = 'EE';
-
-                    $terminals_json_file_dir = DIR_DOWNLOAD."/locations.json";
-                    $terminals_file = fopen($terminals_json_file_dir, "r");
-                    $terminals = fread($terminals_file,filesize($terminals_json_file_dir)+10);
-                    fclose($terminals_file);
-                    $terminals = json_decode($terminals,true);
-
-                $parcel_terminals = '';
-            
-                if (is_array($terminals)){
-                    $terminalsList = array();
-                    foreach ($terminals as $terminal){
-                    if ($terminal['A0_NAME'] != $country && in_array($country,array("LT","EE","LV")) || intval($terminal['TYPE']) == 1)
-                        continue;
-            
-                    if (!isset($grouped_options[$terminal['A1_NAME']]))
-                        $grouped_options[(string)$terminal['A1_NAME']] = array();
-                    $grouped_options[(string)$terminal['A1_NAME']][(string)$terminal['ZIP']] = $terminal['NAME'];
-                    
-                    $terminalsList[] = [$terminal['NAME'], $terminal['Y_COORDINATE'], $terminal['X_COORDINATE'], $terminal['ZIP'], $terminal['A1_NAME'], $terminal['A2_NAME'], $terminal['comment_lit']];
-                    }
-                }
-                return $terminalsList;
-                }
-            private function terminalsModal() {
-                        $this->load->language('extension/shipping/omnivalt');
-            $head = $this->language->get('text_omniva_map_head');
-            $addresses = $this->language->get('text_omniva_terminal_address');
-
-                return '
-                <div id="omnivaLtModal" class="modal">
-                    <div class="omniva-modal-content">
-                        <div class="omniva-modal-header">
-                        <span class="close" id="terminalsModal">&times;</span>
-                        <h5 style="display: inline">'.$head.'</h5>
-                        </div>
-                        <div class="omniva-modal-body" style="/*overflow: hidden;*/">
-                            <div id="map-omniva-terminals">
-                            </div>
-                            <div class="omniva-search-bar" >
-                                <h3 style="margin-top: 0px;">'.$addresses.'</h3>
-                                <div id="omniva-search"></div>
-                                <div class="found_terminals scrollbar" id="style-8"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>';
-            }
-
             private function getOmnivaTranslation() {
                 $this->load->language('extension/shipping/omnivalt');
                 return [
                     'modal_header' => $this->language->get('text_omniva_map_head'),
-                    'terminal_addresses' => $this->language->get('text_omniva_terminal_address'),
-                    'text_select_terminal' => $this->language->get('text_select_omn_terminal'),
-                    'text_search_placeholder' => $this->language->get('text_omniva_search'),
-                    'not_found' => $this->language->get('text_omniva_not_found'),
-                    'text_enter_address' => $this->language->get('text_omniva_search'),
-                    'text_show_in_map' => $this->language->get('text_omniva_show_map'),
-                    'text_show_more' => $this->language->get('text_omniva_show_more'),
-                    'text_back_to_list' => $this->language->get('text_omniva_back_to_list')
+                    'search_bar_title' => $this->language->get('text_omniva_terminal_address'),
+                    'select_terminal' => $this->language->get('text_select_omn_terminal'),
+                    'search_bar_placeholder' => $this->language->get('text_omniva_search'),
+                    'place_not_found' => $this->language->get('text_omniva_not_found'),
+                    'show_on_map' => $this->language->get('text_omniva_show_map'),
+                    'show_more' => $this->language->get('text_omniva_show_more'),
+                    'search_back_to_list' => $this->language->get('text_omniva_back_to_list'),
+                    'terminal_not_selected' => $this->language->get('text_omniva_no_terminal'),
                 ];
             }
         ]]></add>
@@ -121,12 +50,6 @@
     <operation>
         <search><![CDATA[return $this->load->view('common/header', $data);]]></search>
         <add position="ibefore"><![CDATA[
-            $this->load->language('extension/shipping/omnivalt');
-            $data['select_om_teminal'] = $this->language->get('text_select_omn_terminal');
-            $data['stateForMap'] = $this->session->data['language'];
-            $data['country_code']=$this->getCountryForMap();
-            $data['locations']=$this->getTerminalForMap();
-            $data['omnivaModal']='';//$this->terminalsModal();
             $data['omniva_map_translation']=$this->getOmnivaTranslation();
         ]]></add>
     </operation>
