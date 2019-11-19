@@ -14,7 +14,7 @@ class ModelExtensionShippingOmnivalt extends Model
     $currency_carrier = "EUR";
     $total_kg = $this->cart->getWeight();
     $weight_class_id = $this->config->get('config_weight_class_id');
-    $unit = $this->db->query("SELECT unit FROM " . DB_PREFIX . "weight_class_description wcd WHERE (weight_class_id = " . $weight_class_id . ") AND language_id = '" . (int) $this->config->get('config_language_id') . "'");
+    $unit = $this->db->query("SELECT unit FROM `" . DB_PREFIX . "weight_class_description` wcd WHERE (weight_class_id = " . $weight_class_id . ") AND language_id = '" . (int) $this->config->get('config_language_id') . "'");
     $unit = $unit->row['unit'];
     if ($unit == 'g') {
       $total_kg /= 1000;

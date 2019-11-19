@@ -6,24 +6,24 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
     public function install()
     {
-        $sql = "ALTER TABLE " . DB_PREFIX . "order ADD `labelsCount` INT NOT NULL DEFAULT '1',
+        $sql = "ALTER TABLE `" . DB_PREFIX . "order` ADD `labelsCount` INT NOT NULL DEFAULT '1',
                                               ADD `omnivaWeight` FLOAT NOT NULL DEFAULT '1',
                                               ADD `cod_amount` FLOAT DEFAULT 0;";
         $this->db->query($sql);
         $this->load->model('setting/setting');
-        $sql2 = "CREATE TABLE " . DB_PREFIX . "order_omniva (id int NOT NULL AUTO_INCREMENT, tracking TEXT, manifest int, labels text, id_order int, PRIMARY KEY (id), UNIQUE (id_order));";
+        $sql2 = "CREATE TABLE `" . DB_PREFIX . "order_omniva` (id int NOT NULL AUTO_INCREMENT, tracking TEXT, manifest int, labels text, id_order int, PRIMARY KEY (id), UNIQUE (id_order));";
         $this->model_setting_setting->editSetting('omniva', array('omniva_manifest' => 0));
         $this->db->query($sql2);
     }
 
     public function uninstall()
     {
-        $sql = "ALTER TABLE " . DB_PREFIX . "order DROP COLUMN labelsCount,
+        $sql = "ALTER TABLE `" . DB_PREFIX . "order` DROP COLUMN labelsCount,
                                         DROP COLUMN omnivaWeight,
                                         DROP COLUMN cod_amount; ";
 
         $this->db->query($sql);
-        $sql2 = "DROP TABLE " . DB_PREFIX . "order_omniva";
+        $sql2 = "DROP TABLE `" . DB_PREFIX . "order_omniva`";
         $this->db->query($sql2);
 
     }
@@ -38,7 +38,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $labelsCount = $this->request->post['labelsCount'];
             $order = $this->request->post['order_id'];
 
-            $sql = "UPDATE " . DB_PREFIX . "order SET labelsCount = $labelsCount WHERE order_id= $order;";
+            $sql = "UPDATE `" . DB_PREFIX . "order` SET labelsCount = $labelsCount WHERE order_id= $order;";
 
             $this->db->query($sql);
 
@@ -577,7 +577,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
     }
     private function getOrderWeight($order_id)
     {
-        $query = $this->db->query("SELECT SUM(IF(wcd.unit ='g',(p.weight/1000),p.weight) * op.quantity) AS weight FROM " . DB_PREFIX . "order_product op LEFT JOIN " . DB_PREFIX . "product p ON op.product_id = p.product_id LEFT JOIN " . DB_PREFIX . "weight_class_description wcd ON wcd.weight_class_id = p.weight_class_id AND wcd.language_id = '" . (int) $this->config->get('config_language_id') . "' WHERE op.order_id = '" . (int) $order_id . "'");
+        $query = $this->db->query("SELECT SUM(IF(wcd.unit ='g',(p.weight/1000),p.weight) * op.quantity) AS weight FROM `" . DB_PREFIX . "order_product` op LEFT JOIN `" . DB_PREFIX . "product` p ON op.product_id = p.product_id LEFT JOIN `" . DB_PREFIX . "weight_class_description` wcd ON wcd.weight_class_id = p.weight_class_id AND wcd.language_id = '" . (int) $this->config->get('config_language_id') . "' WHERE op.order_id = '" . (int) $order_id . "'");
         if ($query->row['weight']) {
             $weight = $query->row['weight'];
         } else {
@@ -1092,7 +1092,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
     public function setOmnivaOrder($id_order = '', $tracking = '', $label = '')
     {
-        $isPrinted = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_omniva WHERE id_order=" . $id_order . ";");
+        $isPrinted = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order_omniva` WHERE id_order=" . $id_order . ";");
         $manifest = $this->config->get('omniva_manifest');
 
         if ($isPrinted->num_rows > 0) {
@@ -1103,7 +1103,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
             array_unshift($trackingArr, $tracking);
 
-            $this->db->query("UPDATE " . DB_PREFIX . "order_omniva SET tracking='" . json_encode($trackingArr) . "' WHERE id_order=" . $id_order . ";");
+            $this->db->query("UPDATE `" . DB_PREFIX . "order_omniva` SET tracking='" . json_encode($trackingArr) . "' WHERE id_order=" . $id_order . ";");
         } else if ($isPrinted->num_rows == 0) {
             $tracking = array($tracking);
             $tracking = json_encode($tracking);
@@ -1518,25 +1518,25 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $delivery_methodName = $delivery_method[1];
             $delivery_method = $delivery_method[0];
             if ($cod_available == 1 && $cod_value > 0) {
-                $sql = "UPDATE " . DB_PREFIX . "order SET labelsCount = $labelsCount ,
+                $sql = "UPDATE `" . DB_PREFIX . "order` SET labelsCount = $labelsCount ,
               omnivaWeight = $omnivaWeight ,
               shipping_code = '" . $delivery_method . "' ,
               shipping_method = '" . $delivery_methodName . "',
               cod_amount = $cod_value
               WHERE order_id= $order_id;";
 
-                $sql2 = "UPDATE " . DB_PREFIX . "order_total SET title = '" . $delivery_methodName . "' WHERE order_id= $order_id AND code = 'shipping';";
+                $sql2 = "UPDATE `" . DB_PREFIX . "order_total` SET title = '" . $delivery_methodName . "' WHERE order_id= $order_id AND code = 'shipping';";
                 $this->db->query($sql);
                 $this->db->query($sql2);
             } else {
-                $sql = "UPDATE " . DB_PREFIX . "order SET labelsCount = $labelsCount ,
+                $sql = "UPDATE `" . DB_PREFIX . "order` SET labelsCount = $labelsCount ,
         omnivaWeight = $omnivaWeight ,
         shipping_code = '" . $delivery_method . "' ,
         shipping_method = '" . $delivery_methodName . "',
         cod_amount = 888888
         WHERE order_id= $order_id;";
 
-                $sql2 = "UPDATE " . DB_PREFIX . "order_total SET title = '" . $delivery_methodName . "' WHERE order_id= $order_id AND code = 'shipping';";
+                $sql2 = "UPDATE `" . DB_PREFIX . "order_total` SET title = '" . $delivery_methodName . "' WHERE order_id= $order_id AND code = 'shipping';";
                 $this->db->query($sql);
                 $this->db->query($sql2);
 
