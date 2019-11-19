@@ -266,7 +266,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
 		} else {
 			$data['omnivalt_sort_order'] = $this->config->get('omnivalt_sort_order');
 		}
-        $data['omnivalt_terminals'] = $this->model_setting_setting->getSetting('omnivalt_terminals');
+        $data['omnivalt_terminals'] = $this->loadTerminals();
 
         $data['header'] = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');
@@ -288,6 +288,20 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
 
         $this->response->setOutput($this->load->view('extension/shipping/omnivalt', $data));
+    }
+
+    private function loadTerminals()
+    {
+        $terminals_json_file_dir = DIR_DOWNLOAD."omniva_terminals.json";
+        if (!file_exists($terminals_json_file_dir))
+        return false;
+        $terminals_file = fopen($terminals_json_file_dir, "r");
+        if (!$terminals_file)
+        return false;
+        $terminals = fread($terminals_file, filesize($terminals_json_file_dir) + 10);
+        fclose($terminals_file);
+        $terminals = json_decode($terminals, true);
+        return $terminals;
     }
 
     protected function validate()
@@ -327,7 +341,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
         $countries = array();
         $countries['LT'] = 1;
         $countries['LV'] = 2;
-        //$countries['EE'] = 3;
+        $countries['EE'] = 3;
         $cabins = $this->parseCSV($csv, $countries);
         if ($cabins) {
             $terminals = $cabins;
