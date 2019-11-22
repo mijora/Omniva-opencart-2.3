@@ -75,7 +75,7 @@ class ModelExtensionShippingOmnivalt extends Model
           'cost' => $this->currency->convert($price, $currency_carrier, $this->config->get('config_currency')),
           'tax_class_id' => $this->config->get('omnivalt_tax_class_id'),
           'sort_order' => $this->config->get('omnivalt_sort_order'),
-          'text' => $this->currency->format($this->tax->calculate($price, $this->config->get('omnivalt_class_id'), $this->config->get('config_tax')), $this->session->data['currency']),
+          'text' => $this->currency->format($this->tax->calculate($price, $this->config->get('omnivalt_tax_class_id'), $this->config->get('config_tax')), $this->session->data['currency']),
         );
       }
 
