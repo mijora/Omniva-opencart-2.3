@@ -114,21 +114,23 @@
     <operation>
         <search><![CDATA[$shipping = explode('.', $this->request->post['shipping_method']);]]></search>
         <add position="iafter"><![CDATA[
-        // custom for omniva
-				if ($shipping[0] === 'omnivalt'){
-					if (strpos($shipping[1], 'parcel_terminal_') > -1) {
-						$terminal_code = explode('parcel_terminal_', $shipping[1]);
-						if(isset($this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal']['terminals'][$terminal_code[1]])){
-							$method = $this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal'];
-							$method['code'] = $this->request->post['shipping_method'];
-							$method['title'] = $this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal']['terminals'][$terminal_code[1]];
-							$method['terminals'] = null;
-              $shipping_method = $method;
-						}
-					}
-				} else {
-          $shipping_method = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
-        }
+
+		$shipping_method = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
+
+		// custom for omniva
+		if ($shipping[0] === 'omnivalt'){
+			if (strpos($shipping[1], 'parcel_terminal_') > -1) {
+				$terminal_code = explode('parcel_terminal_', $shipping[1]);
+				if(isset($this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal']['terminals'][$terminal_code[1]])){
+					$method = $this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal'];
+					$method['code'] = $this->request->post['shipping_method'];
+					$method['title'] = $this->session->data['shipping_methods'][$shipping[0]]['quote']['parcel_terminal']['terminals'][$terminal_code[1]];
+					$method['terminals'] = null;
+				$shipping_method = $method;
+				}
+			}
+		}
+
         ]]></add>
     </operation>
   </file>
