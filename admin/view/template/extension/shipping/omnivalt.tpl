@@ -306,9 +306,6 @@
                 <?php } ?>
                 <?php } ?>
               </select>
-                             <?php if ($error_tax_class_id) { ?>
-              <div class="text-danger"><?php echo $error_courier_priceee; ?></div>
-              <?php } ?>
             </div>
           </div>
 
