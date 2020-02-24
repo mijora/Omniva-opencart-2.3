@@ -576,7 +576,10 @@ ol li {
   color: #ffffff;
 }
 
-.omniva-terminals-list .omniva-search-input:focus, .omniva-terminals-list .omniva-search-input {
+.omniva-terminals-list .omniva-search-input[type='text']:focus,
+.omniva-terminals-list .omniva-search-input[type='text']:hover,
+.omniva-terminals-list .omniva-search-input[type='text']:active,
+.omniva-terminals-list .omniva-search-input[type='text'] {
   display: inline-block;
   padding: 2px 5px;
   width: 100%;

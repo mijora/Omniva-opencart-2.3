@@ -322,7 +322,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $this->error['password'] = $this->language->get('error_password');
         }
 
-        foreach (array('tax_class_id', 'sender_name', 'sender_address', 'sender_phone', 'sender_postcode', 'sender_city', 'sender_country_code', 'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee', 'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free') as $key) {
+        foreach (array('sender_name', 'sender_address', 'sender_phone', 'sender_postcode', 'sender_city', 'sender_country_code', 'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee', 'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free') as $key) {
             if (!$this->request->post['omnivalt_' . $key]) {
                 $this->error[$key] = $this->language->get('error_required');
             }
