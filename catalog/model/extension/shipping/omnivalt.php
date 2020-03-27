@@ -55,6 +55,18 @@ class ModelExtensionShippingOmnivalt extends Model
           continue;
         }
 
+        $cost = $this->currency->convert($price, $currency_carrier, $this->config->get('config_currency'));
+        $tax_class_id = $this->config->get('omnivalt_tax_class_id');
+        $sort_order = $this->config->get('omnivalt_sort_order');
+        $text = $this->currency->format(
+          $this->tax->calculate(
+            $price,
+            $this->config->get('omnivalt_tax_class_id'),
+            $this->config->get('config_tax')
+          ),
+          $this->session->data['currency']
+        );
+
         $title = $this->language->get('text_' . $service_Active);
         $codeCarrier = "omnivalt";
         if ($service_Active == "parcel_terminal") {
@@ -63,19 +75,27 @@ class ModelExtensionShippingOmnivalt extends Model
         if ($codeCarrier == 'fake') {
           $cabins = $this->loadTerminals();
           $terminals = $this->groupTerminals($cabins, $address['iso_code_2']);
-        } else { // courier doesnt need terminals
-          $terminals = null;
+          foreach ($terminals as $code => $terminal) {
+            $quote_data[$service_Active . "_$code"] = array(
+              'code' => 'omnivalt.' . $service_Active . "_$code",
+              'title' => $terminal,
+              'head' => $title,
+              'cost' => $cost,
+              'tax_class_id' => $tax_class_id,
+              'sort_order' => $sort_order,
+              'text' => $text,
+            );
+          }
         }
 
         $quote_data[$service_Active] = array(
           'code' => $codeCarrier . '.' . $service_Active,
           'title' => $title,
           'head' => $title,
-          'terminals' => $terminals,
-          'cost' => $this->currency->convert($price, $currency_carrier, $this->config->get('config_currency')),
-          'tax_class_id' => $this->config->get('omnivalt_tax_class_id'),
-          'sort_order' => $this->config->get('omnivalt_sort_order'),
-          'text' => $this->currency->format($this->tax->calculate($price, $this->config->get('omnivalt_tax_class_id'), $this->config->get('config_tax')), $this->session->data['currency']),
+          'cost' => $cost,
+          'tax_class_id' => $tax_class_id,
+          'sort_order' => $sort_order,
+          'text' => $text,
         );
       }
 
