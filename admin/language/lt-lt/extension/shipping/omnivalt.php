@@ -87,4 +87,5 @@ $_['text_eshop_settings_p']    ='galima keisti Omnivalt modulio nustatymuose.';
 $_['text_omniva_data_send']    = 'Siunčiami duomenys';
 $_['text_omniva_not_found'] = 'Pagal pateiktus duomenis nieko nera.';
 
+$_['entry_free_shipping_enabled'] = "Įjungti nemokamo pristatymo nustatymus";
 $_['entry_free_price'] = "nemokamas siuntimas nuo";

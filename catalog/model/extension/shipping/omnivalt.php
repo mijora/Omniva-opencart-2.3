@@ -10,7 +10,6 @@ class ModelExtensionShippingOmnivalt extends Model
 {
   public function getQuote($address)
   {
-
     $currency_carrier = "EUR";
     $total_kg = $this->cart->getWeight();
     $weight_class_id = $this->config->get('config_weight_class_id');
@@ -19,6 +18,7 @@ class ModelExtensionShippingOmnivalt extends Model
     if ($unit == 'g') {
       $total_kg /= 1000;
     }
+    $cart_total = (float) $this->getTotal();
     $this->load->language('extension/shipping/omnivalt');
 
     $method_data = array();
@@ -51,8 +51,17 @@ class ModelExtensionShippingOmnivalt extends Model
             }
           }
         }
+
         if ($price === false) {
           continue;
+        }
+
+        if ((bool) $this->config->get('omnivalt_free_shipping_enabled')) {
+          $free_from = (float) $this->config->get('omnivalt_' . strtolower($address['iso_code_2']) . '_free');
+
+          if ($cart_total >= $free_from) {
+            $price = 0;
+          }
         }
 
         $cost = $this->currency->convert($price, $currency_carrier, $this->config->get('config_currency'));
@@ -112,6 +121,42 @@ class ModelExtensionShippingOmnivalt extends Model
       );
     }
     return $method_data;
+  }
+
+  private function getTotal()
+  {
+    $totals = array();
+    $taxes = $this->cart->getTaxes();
+    $total = 0;
+    // Because __call can not keep var references so we put them into an array.
+    $total_data = array(
+      'totals' => &$totals,
+      'taxes'  => &$taxes,
+      'total'  => &$total
+    );
+
+    $this->load->model('extension/extension');
+
+    $sort_order = array();
+
+    $results = $this->model_extension_extension->getExtensions('total');
+
+    foreach ($results as $key => $value) {
+      $sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
+    }
+
+    array_multisort($sort_order, SORT_ASC, $results);
+
+    foreach ($results as $result) {
+      if ($this->config->get($result['code'] . '_status')) {
+        $this->load->model('extension/total/' . $result['code']);
+
+        // We have to put the totals in an array so that they pass by reference.
+        $this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
+      }
+    }
+
+    return $total;
   }
 
   private function loadTerminals()

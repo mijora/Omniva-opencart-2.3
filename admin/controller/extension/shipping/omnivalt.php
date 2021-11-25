@@ -65,7 +65,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
         }
 
-        foreach (array('entry_free_price', 'cron_url', 'heading_title', 'text_edit', 'text_enabled', 'text_disabled', 'text_yes', 'text_no', 'text_none', 'text_parcel_terminal', 'text_courier', 'text_sorting_center', 'entry_url', 'entry_user', 'entry_password', 'entry_service', 'entry_pickup_type', 'entry_company', 'entry_bankaccount', 'entry_pickupstart', 'entry_pickupfinish', 'entry_cod', 'entry_status', 'entry_sort_order', 'entry_parcel_terminal_price', 'entry_courier_price', 'entry_terminals', 'button_save', 'button_cancel', 'button_download', 'entry_sender_name', 'entry_sender_address', 'entry_sender_city', 'entry_sender_postcode', 'entry_sender_phone', 'entry_sender_country_code') as $key) {
+        foreach (array('entry_free_shipping_enabled', 'entry_free_price', 'cron_url', 'heading_title', 'text_edit', 'text_enabled', 'text_disabled', 'text_yes', 'text_no', 'text_none', 'text_parcel_terminal', 'text_courier', 'text_sorting_center', 'entry_url', 'entry_user', 'entry_password', 'entry_service', 'entry_pickup_type', 'entry_company', 'entry_bankaccount', 'entry_pickupstart', 'entry_pickupfinish', 'entry_cod', 'entry_status', 'entry_sort_order', 'entry_parcel_terminal_price', 'entry_courier_price', 'entry_terminals', 'button_save', 'button_cancel', 'button_download', 'entry_sender_name', 'entry_sender_address', 'entry_sender_city', 'entry_sender_postcode', 'entry_sender_phone', 'entry_sender_country_code') as $key) {
             $data[$key] = $this->language->get($key);
         }
 
@@ -245,11 +245,18 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $data['omnivalt_sort_order'] = $this->config->get('omnivalt_sort_order');
         }
 
+        if (isset($this->request->post['omnivalt_free_shipping_enabled'])) {
+			$data['omnivalt_free_shipping_enabled'] = $this->request->post['omnivalt_free_shipping_enabled'];
+		} else {
+			$data['omnivalt_free_shipping_enabled'] = $this->config->get('omnivalt_free_shipping_enabled');
+        }
+
         if (isset($this->request->post['omnivalt_lt_free'])) {
 			$data['omnivalt_lt_free'] = $this->request->post['omnivalt_lt_free'];
 		} else {
 			$data['omnivalt_lt_free'] = $this->config->get('omnivalt_lt_free');
         }
+        
         if (isset($this->request->post['omnivalt_lv_free'])) {
                 $data['omnivalt_lv_free'] = $this->request->post['omnivalt_lv_free'];
             } else {
@@ -322,7 +329,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $this->error['password'] = $this->language->get('error_password');
         }
 
-        foreach (array('sender_name', 'sender_address', 'sender_phone', 'sender_postcode', 'sender_city', 'sender_country_code', 'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee', 'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free') as $key) {
+        foreach (array('tax_class_id', 'sender_name', 'sender_address', 'sender_phone', 'sender_postcode', 'sender_city', 'sender_country_code', 'sender_phone', 'parcel_terminal_price', 'parcel_terminal_pricelv', 'parcel_terminal_priceee', 'courier_price', 'courier_pricelv', 'courier_priceee', 'lt_free', 'lv_free', 'ee_free') as $key) {
             if (!$this->request->post['omnivalt_' . $key]) {
                 $this->error[$key] = $this->language->get('error_required');
             }
@@ -442,6 +449,9 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
     protected static function getReferenceNumber($order_number)
     {
+        if (strlen($order_number) < 2) {
+            $order_number = str_pad($order_number, 2, '0', STR_PAD_LEFT);
+        }
         $order_number = (string) $order_number;
         $kaal = array(7, 3, 1);
         $sl = $st = strlen($order_number);
@@ -636,7 +646,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
                 $xmlResponse = str_ireplace(['SOAP-ENV:', 'SOAP:'], '', $xmlResponse);
                 $xml = simplexml_load_string($xmlResponse);
                 if (!is_object($xml)) {
-                    $errors[] = $this->l('Response is in the wrong format');
+                    $errors[] = 'Response is in the wrong format';
                 }
                 if (is_object($xml) && is_object($xml->Body->businessToClientMsgResponse->faultyPacketInfo->barcodeInfo)) {
                     foreach ($xml->Body->businessToClientMsgResponse->faultyPacketInfo->barcodeInfo as $data) {
@@ -767,7 +777,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
         if (strlen(trim($response)) > 0) {
             $xml = simplexml_load_string($response);
             if (!is_object($xml)) {
-                $errors[] = $this->l('Response is in the wrong format');
+                $errors[] = 'Response is in the wrong format';
             }
             if (is_object($xml) && is_object($xml->event)) {
                 foreach ($xml->event as $awbinfo) {
@@ -807,61 +817,61 @@ class ControllerExtensionShippingOmnivalt extends Controller
     public function getEventCode($code)
     {
         $tracking = [
-            'PACKET_EVENT_IPS_C' => $this->l("Shipment from country of departure"),
-            'PACKET_EVENT_FROM_CONTAINER' => $this->l("Arrival to post office"),
-            'PACKET_EVENT_IPS_D' => $this->l("Arrival to destination country"),
-            'PACKET_EVENT_SAVED' => $this->l("Saving"),
-            'PACKET_EVENT_DELIVERY_CANCELLED' => $this->l("Cancelling of delivery"),
-            'PACKET_EVENT_IN_POSTOFFICE' => $this->l("Arrival to Omniva"),
-            'PACKET_EVENT_IPS_E' => $this->l("Customs clearance"),
-            'PACKET_EVENT_DELIVERED' => $this->l("Delivery"),
-            'PACKET_EVENT_FROM_WAYBILL_LIST' => $this->l("Arrival to post office"),
-            'PACKET_EVENT_IPS_A' => $this->l("Acceptance of packet from client"),
-            'PACKET_EVENT_IPS_H' => $this->l("Delivery attempt"),
-            'PACKET_EVENT_DELIVERING_TRY' => $this->l("Delivery attempt"),
-            'PACKET_EVENT_DELIVERY_CALL' => $this->l("Preliminary calling"),
-            'PACKET_EVENT_IPS_G' => $this->l("Arrival to destination post office"),
-            'PACKET_EVENT_ON_ROUTE_LIST' => $this->l("Dispatching"),
-            'PACKET_EVENT_IN_CONTAINER' => $this->l("Dispatching"),
-            'PACKET_EVENT_PICKED_UP_WITH_SCAN' => $this->l("Acceptance of packet from client"),
-            'PACKET_EVENT_RETURN' => $this->l("Returning"),
-            'PACKET_EVENT_SEND_REC_SMS_NOTIF' => $this->l("SMS to receiver"),
-            'PACKET_EVENT_ARRIVED_EXCESS' => $this->l("Arrival to post office"),
-            'PACKET_EVENT_IPS_I' => $this->l("Delivery"),
-            'PACKET_EVENT_ON_DELIVERY_LIST' => $this->l("Handover to courier"),
-            'PACKET_EVENT_PICKED_UP_QUANTITATIVELY' => $this->l("Acceptance of packet from client"),
-            'PACKET_EVENT_SEND_REC_EMAIL_NOTIF' => $this->l("E-MAIL to receiver"),
-            'PACKET_EVENT_FROM_DELIVERY_LIST' => $this->l("Arrival to post office"),
-            'PACKET_EVENT_OPENING_CONTAINER' => $this->l("Arrival to post office"),
-            'PACKET_EVENT_REDIRECTION' => $this->l("Redirection"),
-            'PACKET_EVENT_IN_DEST_POSTOFFICE' => $this->l("Arrival to receiver's post office"),
-            'PACKET_EVENT_STORING' => $this->l("Storing"),
-            'PACKET_EVENT_IPS_EDD' => $this->l("Item into sorting centre"),
-            'PACKET_EVENT_IPS_EDC' => $this->l("Item returned from customs"),
-            'PACKET_EVENT_IPS_EDB' => $this->l("Item presented to customs"),
-            'PACKET_EVENT_IPS_EDA' => $this->l("Held at inward OE"),
-            'PACKET_STATE_BEING_TRANSPORTED' => $this->l("Being transported"),
-            'PACKET_STATE_CANCELLED' => $this->l("Cancelled"),
-            'PACKET_STATE_CONFIRMED' => $this->l("Confirmed"),
-            'PACKET_STATE_DELETED' => $this->l("Deleted"),
-            'PACKET_STATE_DELIVERED' => $this->l("Delivered"),
-            'PACKET_STATE_DELIVERED_POSTOFFICE' => $this->l("Arrived at post office"),
-            'PACKET_STATE_HANDED_OVER_TO_COURIER' => $this->l("Transmitted to courier"),
-            'PACKET_STATE_HANDED_OVER_TO_PO' => $this->l("Re-addressed to post office"),
-            'PACKET_STATE_IN_CONTAINER' => $this->l("In container"),
-            'PACKET_STATE_IN_WAREHOUSE' => $this->l("At warehouse"),
-            'PACKET_STATE_ON_COURIER' => $this->l("At delivery"),
-            'PACKET_STATE_ON_HANDOVER_LIST' => $this->l("In transition sheet"),
-            'PACKET_STATE_ON_HOLD' => $this->l("Waiting"),
-            'PACKET_STATE_REGISTERED' => $this->l("Registered"),
-            'PACKET_STATE_SAVED' => $this->l("Saved"),
-            'PACKET_STATE_SORTED' => $this->l("Sorted"),
-            'PACKET_STATE_UNCONFIRMED' => $this->l("Unconfirmed"),
-            'PACKET_STATE_UNCONFIRMED_NO_TARRIF' => $this->l("Unconfirmed (No tariff)"),
-            'PACKET_STATE_WAITING_COURIER' => $this->l("Awaiting collection"),
-            'PACKET_STATE_WAITING_TRANSPORT' => $this->l("In delivery list"),
-            'PACKET_STATE_WAITING_UNARRIVED' => $this->l("Waiting, hasn't arrived"),
-            'PACKET_STATE_WRITTEN_OFF' => $this->l("Written off"),
+            'PACKET_EVENT_IPS_C' => "Shipment from country of departure",
+            'PACKET_EVENT_FROM_CONTAINER' => "Arrival to post office",
+            'PACKET_EVENT_IPS_D' => "Arrival to destination country",
+            'PACKET_EVENT_SAVED' => "Saving",
+            'PACKET_EVENT_DELIVERY_CANCELLED' => "Cancelling of delivery",
+            'PACKET_EVENT_IN_POSTOFFICE' => "Arrival to Omniva",
+            'PACKET_EVENT_IPS_E' => "Customs clearance",
+            'PACKET_EVENT_DELIVERED' => "Delivery",
+            'PACKET_EVENT_FROM_WAYBILL_LIST' => "Arrival to post office",
+            'PACKET_EVENT_IPS_A' => "Acceptance of packet from client",
+            'PACKET_EVENT_IPS_H' => "Delivery attempt",
+            'PACKET_EVENT_DELIVERING_TRY' => "Delivery attempt",
+            'PACKET_EVENT_DELIVERY_CALL' => "Preliminary calling",
+            'PACKET_EVENT_IPS_G' => "Arrival to destination post office",
+            'PACKET_EVENT_ON_ROUTE_LIST' => "Dispatching",
+            'PACKET_EVENT_IN_CONTAINER' => "Dispatching",
+            'PACKET_EVENT_PICKED_UP_WITH_SCAN' => "Acceptance of packet from client",
+            'PACKET_EVENT_RETURN' => "Returning",
+            'PACKET_EVENT_SEND_REC_SMS_NOTIF' => "SMS to receiver",
+            'PACKET_EVENT_ARRIVED_EXCESS' => "Arrival to post office",
+            'PACKET_EVENT_IPS_I' => "Delivery",
+            'PACKET_EVENT_ON_DELIVERY_LIST' => "Handover to courier",
+            'PACKET_EVENT_PICKED_UP_QUANTITATIVELY' => "Acceptance of packet from client",
+            'PACKET_EVENT_SEND_REC_EMAIL_NOTIF' => "E-MAIL to receiver",
+            'PACKET_EVENT_FROM_DELIVERY_LIST' => "Arrival to post office",
+            'PACKET_EVENT_OPENING_CONTAINER' => "Arrival to post office",
+            'PACKET_EVENT_REDIRECTION' => "Redirection",
+            'PACKET_EVENT_IN_DEST_POSTOFFICE' => "Arrival to receiver's post office",
+            'PACKET_EVENT_STORING' => "Storing",
+            'PACKET_EVENT_IPS_EDD' => "Item into sorting centre",
+            'PACKET_EVENT_IPS_EDC' => "Item returned from customs",
+            'PACKET_EVENT_IPS_EDB' => "Item presented to customs",
+            'PACKET_EVENT_IPS_EDA' => "Held at inward OE",
+            'PACKET_STATE_BEING_TRANSPORTED' => "Being transported",
+            'PACKET_STATE_CANCELLED' => "Cancelled",
+            'PACKET_STATE_CONFIRMED' => "Confirmed",
+            'PACKET_STATE_DELETED' => "Deleted",
+            'PACKET_STATE_DELIVERED' => "Delivered",
+            'PACKET_STATE_DELIVERED_POSTOFFICE' => "Arrived at post office",
+            'PACKET_STATE_HANDED_OVER_TO_COURIER' => "Transmitted to courier",
+            'PACKET_STATE_HANDED_OVER_TO_PO' => "Re-addressed to post office",
+            'PACKET_STATE_IN_CONTAINER' => "In container",
+            'PACKET_STATE_IN_WAREHOUSE' => "At warehouse",
+            'PACKET_STATE_ON_COURIER' => "At delivery",
+            'PACKET_STATE_ON_HANDOVER_LIST' => "In transition sheet",
+            'PACKET_STATE_ON_HOLD' => "Waiting",
+            'PACKET_STATE_REGISTERED' => "Registered",
+            'PACKET_STATE_SAVED' => "Saved",
+            'PACKET_STATE_SORTED' => "Sorted",
+            'PACKET_STATE_UNCONFIRMED' => "Unconfirmed",
+            'PACKET_STATE_UNCONFIRMED_NO_TARRIF' => "Unconfirmed (No tariff)",
+            'PACKET_STATE_WAITING_COURIER' => "Awaiting collection",
+            'PACKET_STATE_WAITING_TRANSPORT' => "In delivery list",
+            'PACKET_STATE_WAITING_UNARRIVED' => "Waiting, hasn't arrived",
+            'PACKET_STATE_WRITTEN_OFF' => "Written off",
         ];
         if (isset($tracking[$code])) {
             return $tracking[$code];

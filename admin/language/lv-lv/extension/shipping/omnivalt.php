@@ -86,3 +86,5 @@ $_['text_eshop_settings_p']    = 'var mainīt Omnivalt moduļa iestatījumos.';
 $_['text_omniva_data_send']    = 'Datu sūtīšana';
 $_['text_omniva_not_found']    = 'Nekas nav atrasts';
 
+$_['entry_free_shipping_enabled'] = "Iespējot bezmaksas piegādes iestatījumu";
+$_['entry_free_price'] = "brīvs no";

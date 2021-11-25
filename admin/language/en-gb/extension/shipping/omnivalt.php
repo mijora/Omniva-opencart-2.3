@@ -93,3 +93,6 @@ $_['text_eshop_settings']      = 'E-shop address settings';
 $_['text_eshop_settings_p']    = 'can be changed in the Omnivalt module settings.';
 $_['text_omniva_data_send']    = 'Sending data';
 $_['text_omniva_not_found']    = 'Nothing found.';
+
+$_['entry_free_shipping_enabled'] = "Enable free shipping setting";
+$_['entry_free_price'] = "free from";
