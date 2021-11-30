@@ -89,3 +89,7 @@ $_['text_omniva_not_found'] = 'Pagal pateiktus duomenis nieko nera.';
 
 $_['entry_free_shipping_enabled'] = "Įjungti nemokamo pristatymo nustatymus";
 $_['entry_free_price'] = "nemokamas siuntimas nuo";
+
+$_['entry_label_print_type'] = 'Spausdinimo tipas';
+$_['option_label_print_type_1'] = 'A4 (4 lipdukai)';
+$_['option_label_print_type_2'] = '1 lipdukas (100mm x 150mm)';

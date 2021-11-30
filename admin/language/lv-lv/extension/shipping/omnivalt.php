@@ -88,3 +88,7 @@ $_['text_omniva_not_found']    = 'Nekas nav atrasts';
 
 $_['entry_free_shipping_enabled'] = "Iespējot bezmaksas piegādes iestatījumu";
 $_['entry_free_price'] = "brīvs no";
+
+$_['entry_label_print_type'] = 'Drukāt etiķeti';
+$_['option_label_print_type_1'] = 'A4 (4 etiķetes)';
+$_['option_label_print_type_2'] = 'Viena etiķete (100 mm x 150 mm)';

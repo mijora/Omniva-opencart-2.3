@@ -96,3 +96,7 @@ $_['text_omniva_not_found']    = 'Nothing found.';
 
 $_['entry_free_shipping_enabled'] = "Enable free shipping setting";
 $_['entry_free_price'] = "free from";
+
+$_['entry_label_print_type'] = 'Print label';
+$_['option_label_print_type_1'] = 'A4 (4 labels)';
+$_['option_label_print_type_2'] = 'Single label (100mm x 150mm)';
