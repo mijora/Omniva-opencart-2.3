@@ -55,6 +55,19 @@
               <?php } ?>
             </div>
           </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-omniva-label-print-type"><?php echo $entry_label_print_type; ?></label>
+            <div class="col-sm-10">
+              <select name="omnivalt_label_print_type" value="<?php echo $omnivalt_sender_country_code; ?>" id="input-omniva-label-print-type" class="form-control">
+                <option value="1" <?php if ($omnivalt_label_print_type == '1'): ?> selected <?php endif; ?> >
+                  <?php echo $option_label_print_type_1; ?>
+                </option>
+                <option value="2" <?php if ($omnivalt_label_print_type == '2'): ?> selected <?php endif; ?> >
+                  <?php echo $option_label_print_type_2; ?>
+                </option>
+              </select>
+            </div>
+          </div>
           <div class="form-group required">
             <label class="col-sm-2 control-label" for="input-sender_name"><?php echo $entry_sender_name; ?></label>
             <div class="col-sm-10">

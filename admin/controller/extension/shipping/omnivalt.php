@@ -65,7 +65,16 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
         }
 
-        foreach (array('entry_free_shipping_enabled', 'entry_free_price', 'cron_url', 'heading_title', 'text_edit', 'text_enabled', 'text_disabled', 'text_yes', 'text_no', 'text_none', 'text_parcel_terminal', 'text_courier', 'text_sorting_center', 'entry_url', 'entry_user', 'entry_password', 'entry_service', 'entry_pickup_type', 'entry_company', 'entry_bankaccount', 'entry_pickupstart', 'entry_pickupfinish', 'entry_cod', 'entry_status', 'entry_sort_order', 'entry_parcel_terminal_price', 'entry_courier_price', 'entry_terminals', 'button_save', 'button_cancel', 'button_download', 'entry_sender_name', 'entry_sender_address', 'entry_sender_city', 'entry_sender_postcode', 'entry_sender_phone', 'entry_sender_country_code') as $key) {
+        foreach (array(
+                'entry_free_shipping_enabled', 'entry_free_price', 'cron_url', 'heading_title', 'text_edit', 
+                'text_enabled', 'text_disabled', 'text_yes', 'text_no', 'text_none', 'text_parcel_terminal', 'text_courier', 
+                'text_sorting_center', 'entry_url', 'entry_user', 'entry_password', 'entry_service', 'entry_pickup_type', 
+                'entry_company', 'entry_bankaccount', 'entry_pickupstart', 'entry_pickupfinish', 'entry_cod', 'entry_status', 
+                'entry_sort_order', 'entry_parcel_terminal_price', 'entry_courier_price', 'entry_terminals', 'button_save', 
+                'button_cancel', 'button_download', 'entry_sender_name', 'entry_sender_address', 'entry_sender_city', 
+                'entry_sender_postcode', 'entry_sender_phone', 'entry_sender_country_code',
+                'entry_label_print_type', 'option_label_print_type_1', 'option_label_print_type_2'
+            ) as $key) {
             $data[$key] = $this->language->get($key);
         }
 
@@ -136,6 +145,12 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $data['omnivalt_password'] = $this->request->post['omnivalt_password'];
         } else {
             $data['omnivalt_password'] = $this->config->get('omnivalt_password');
+        }
+
+        if (isset($this->request->post['omnivalt_label_print_type'])) {
+            $data['omnivalt_label_print_type'] = $this->request->post['omnivalt_label_print_type'];
+        } else {
+            $data['omnivalt_label_print_type'] = $this->config->get('omnivalt_label_print_type');
         }
 
         if (isset($this->request->post['omnivalt_service'])) {
@@ -914,13 +929,18 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $this->load->model('setting/setting');
             $this->load->model('sale/order');
             require_once DIR_SYSTEM . 'omnivalt_lib/tcpdf/tcpdf.php';
-            require_once DIR_SYSTEM . 'omnivalt_lib/fpdi/fpdi.php';
+			require_once DIR_SYSTEM . 'omnivalt_lib/fpdi/src/autoload.php';
             $errors = array();
             $object = '';
             $pages = 0;
-            $pdf = new FPDI();
+            $pdf = new \setasign\Fpdi\Tcpdf\Fpdi('P');
             $pdf->setPrintHeader(false);
             $pdf->setPrintFooter(false);
+
+            $label_print_type = (int) $this->config->get('omnivalt_label_print_type');
+            if (!in_array($label_print_type, [1, 2])) {
+                $label_print_type = 1; // default is A4
+            }
 
             foreach ($_POST['selected'] as $order_id) {
 
@@ -939,7 +959,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
                 $weight = $fullWeight / $count;
 
                 if ($order['shipping_code'] == 'omnivalt.courier') {
-/************ container for courier *********/
+                    /************ container for courier *********/
                     $pack = $count;
                     $order['id'] = $order_id;
                     $labels = $order_id . '_' . $pack;
@@ -947,7 +967,6 @@ class ControllerExtensionShippingOmnivalt extends Controller
                         $labels = $order_id . '_0';
                     }
 
-//var_dump($labels);
                     //if printed
                     $shortage = 0;
                     $shortageLbl = '';
@@ -961,10 +980,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
 
                         }
                     }
-                    /*print'<pre>';
-                    var_dump($this->getOrderTrack($order_id));
-                    print'</pre>';
-                    exit();*/
+
                     if ($shortage > 0 && is_integer($shortageLbl)) { //var_dump($shortageLbl);exit();
                         $status = $this->get_tracking_number($order, $weight, $shortage, 'courier');
                         if ($status['status']) {
@@ -972,8 +988,6 @@ class ControllerExtensionShippingOmnivalt extends Controller
                                 $labelPrint = $order_id . '_' . $shortageLbl;
                                 $this->getShipmentLabels($barcode, $labelPrint);
                                 if (isset($barcode) and $barcode == true) {
-                                    //var_dump($barcode);
-
                                     $this->updateOrderStatus($order_id, $status_id, $barcode);
                                     $this->setOmnivaOrder($order_id, $barcode);
                                 }
@@ -991,31 +1005,52 @@ class ControllerExtensionShippingOmnivalt extends Controller
                         }
 
                         $pagecount = $pdf->setSourceFile($label_url);
-                        $newPG = array(0, 4, 8, 12, 16, 20, 24, 28, 32);
-                        if ($this->labelsMix >= 4) {
-                            $pdf->AddPage();
-                            $page = 1;
-                            $templateId = $pdf->importPage($page);
-                            $this->labelsMix = 0;
-                        }
-                        $tplidx = $pdf->ImportPage(1);
-                        if ($this->labelsMix == 0) {
-                            $pdf->useTemplate($tplidx, 5, 15, 94.5, 108, true);
-                        } else if ($this->labelsMix == 1) {
-                            $pdf->useTemplate($tplidx, 110, 15, 94.5, 108, true);
-                        } else if ($this->labelsMix == 2) {
-                            $pdf->useTemplate($tplidx, 5, 180, 94.5, 108, true);
-                        } else if ($this->labelsMix == 3) {
 
-                            $pdf->useTemplate($tplidx, 110, 180, 94.5, 108, true);
+                        switch ($label_print_type) {
+							case 1: // A4
+								$newPG = array(0, 4, 8, 12, 16, 20, 24, 28, 32);
 
-                        } else {echo 'Problems with labels count, please, select one order!!!';}
-                        $pages++;
+								if ($this->labelsMix >= 4) {
+									$pdf->AddPage();
+									$page = 1;
+									$templateId = $pdf->importPage($page);
+									$this->labelsMix = 0;
+								}
+								$tplidx = $pdf->ImportPage(1);
+								if ($this->labelsMix == 0) {
+									$pdf->useTemplate($tplidx, 5, 15, 94.5, 108, false);
+								} else if ($this->labelsMix == 1) {
+									$pdf->useTemplate($tplidx, 110, 15, 94.5, 108, false);
+								} else if ($this->labelsMix == 2) {
+									$pdf->useTemplate($tplidx, 5, 140, 94.5, 108, false);
+								} else if ($this->labelsMix == 3) {
+									$pdf->useTemplate($tplidx, 110, 140, 94.5, 108, false);
+								} else {
+									echo 'Problems with labels count, please, select one order!!!';
+								}
 
-                        $this->labelsMix++;
+								$pages++;
+
+								$this->labelsMix++;
+
+								break;
+
+							case 2: // Original
+								for ($i = 1; $i <= $pagecount; $i++) {
+									$tplidx = $pdf->ImportPage($i);
+									$s = $pdf->getTemplatesize($tplidx);
+									$pdf->AddPage('P', array($s['width'], $s['height']));
+									$pdf->useTemplate($tplidx);
+
+									$pages++;
+								}
+							default:
+								# code...
+								break;
+						}
                     }
                 } else {
-/**************container for parcel terminals ************* */
+                    /**************container for parcel terminals ************* */
                     for ($count = 0; $count < intval($order['labelsCount']); $count++) {
 
                         $pack = $count;
@@ -1059,38 +1094,49 @@ class ControllerExtensionShippingOmnivalt extends Controller
                             }
 
                         }
-                        //var_dump($this->labelsMix);exit();
+
                         $pagecount = $pdf->setSourceFile($label_url);
-                        $newPG = array(0, 4, 8, 12, 16, 20, 24, 28, 32);
-                        if ($this->labelsMix >= 4) {
-                            $pdf->AddPage();
-                            $page = 1;
-                            $templateId = $pdf->importPage($page);
-                            $this->labelsMix = 0;
-                        }
-                        //for ($i = 1; $i <= $pagecount; $i++) {
-                        $tplidx = $pdf->ImportPage(1);
 
-                        //if ($x == 1){
-                        if ($this->labelsMix == 0) {
-                            $pdf->useTemplate($tplidx, 5, 15, 94.5, 108, true);
-                            //} else if($x==2){
-                        } else if ($this->labelsMix == 1) {
-                            $pdf->useTemplate($tplidx, 110, 15, 94.5, 108, true);
-                            //} else if($x==3) {
-                        } else if ($this->labelsMix == 2) {
-                            $pdf->useTemplate($tplidx, 5, 180, 94.5, 108, true);
-                        } else if ($this->labelsMix == 3) {
+                        switch ($label_print_type) {
+							case 1: // A4
+								$newPG = array(0, 4, 8, 12, 16, 20, 24, 28, 32);
+								if ($this->labelsMix >= 4) {
+									$pdf->AddPage();
+									$page = 1;
+									$templateId = $pdf->importPage($page);
+									$this->labelsMix = 0;
+								}
 
-                            $pdf->useTemplate($tplidx, 110, 180, 94.5, 108, true);
+								$tplidx = $pdf->ImportPage(1);
+								if ($this->labelsMix == 0) {
+									$pdf->useTemplate($tplidx, 5, 15, 94.5, 108, false);
+								} else if ($this->labelsMix == 1) {
+									$pdf->useTemplate($tplidx, 110, 15, 94.5, 108, false);
+								} else if ($this->labelsMix == 2) {
+									$pdf->useTemplate($tplidx, 5, 140, 94.5, 108, false);
+								} else if ($this->labelsMix == 3) {
+									$pdf->useTemplate($tplidx, 110, 140, 94.5, 108, false);
+								} else {
+									echo 'Problems with labels count, please, select one order!!!';
+								}
+								$pages++;
+								$this->labelsMix++;
+								break;
+							case 2: // original
+								for ($i = 1; $i <= $pagecount; $i++) {
+									$tplidx = $pdf->ImportPage($i);
+									$s = $pdf->getTemplatesize($tplidx);
+									$pdf->AddPage('P', array($s['width'], $s['height']));
+									$pdf->useTemplate($tplidx);
 
-                        } else {echo 'Problems with labels count, please, select one order!!!';}
-                        $pages++;
-                        //}
+									$pages++;
+								}
+								break;
 
-                        //$x++;
-                        //if($ik != $cicleCount -1)
-                        $this->labelsMix++;
+							default:
+								# code...
+								break;
+						}
                         if ($track_numer) {
                             $this->updateOrderStatus($order_id, $status_id, $track_numer);
                             $this->setOmnivaOrder($order_id, $track_numer);
@@ -1098,7 +1144,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
                         }
 
                     }
-/****************************** */
+                    /****************************** */
                 }
             }
             if ($pages) {
