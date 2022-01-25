@@ -582,7 +582,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $assignCount = null;
         }
         for ($i = 0; $i < $packs; $i++):
-            $postCode = preg_match('/\d+/', $order['shipping_postcode'], $matches); //426r    <address postcode="'.$order['shipping_postcode'].'"
+            $postCode = preg_match('/(LV-)?\d+/', $order['shipping_postcode'], $matches); //426r    <address postcode="'.$order['shipping_postcode'].'"
             $postCode = $postCode ? $matches[0] : '';
             $xmlRequest .= '
 		                       <item service="' . $service . '" ' . $assignCount . '>
@@ -1380,7 +1380,7 @@ class ControllerExtensionShippingOmnivalt extends Controller
             $this->load->model('setting/setting');
             $this->load->model('sale/order');
             require_once DIR_SYSTEM . 'omnivalt_lib/tcpdf/tcpdf.php';
-            require_once DIR_SYSTEM . 'omnivalt_lib/fpdi/fpdi.php';
+            require_once DIR_SYSTEM . 'omnivalt_lib/fpdi/src/autoload.php';
             $errors = array();
             $object = '';
             $pages = 0;
