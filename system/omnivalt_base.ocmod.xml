@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Omniva Base Mod for OC2.3</name>
+    <version>1.0.0</version>
+    <author>Mijora</author>
+    <link>https://www.mijora.lt</link>
+    <code>mijoralt_base</code>
+
+    <!-- ADMIN -->
+
+    <file path="admin/controller/common/column_left.php">
+        <operation>
+            <search><![CDATA[$extension = array();]]></search>
+            <add position="after"><![CDATA[
+                $this->load->language('extension/shipping/omnivalt');                 
+                if ($this->user->hasPermission('access', 'omnivalt/omnivalt')) {        
+                        $omniva[] = array(
+                            'name'     => $this->language->get('menu_manifest'),
+                            'href'     => $this->url->link('omnivalt/omnivalt', 'token=' . $this->session->data['token'], true),
+                            'children' => array()      
+                        );                  
+                }
+                if ($this->user->hasPermission('access', 'extension/shipping/omnivalt')) {        
+                    $omniva[] = array(
+                        'name'     => $this->language->get('menu_settings'),
+                        'href'     => $this->url->link('extension/shipping/omnivalt', 'token=' . $this->session->data['token'], true),
+                        'children' => array()      
+                    );                  
+                }
+                if ($this->user->hasPermission('access', 'extension/shipping/omnivalt')) {        
+                    $extension[] = array(
+                        'name'     => $this->language->get('menu_head'),
+                        'href'     => '',
+                        'children' => $omniva      
+                    );                  
+                }
+                ]]>
+            </add>
+        </operation>
+    </file>
+
+    <file path="admin/controller/sale/order.php" error="log">
+        <operation error="skip">
+            <search><![CDATA[class ControllerSaleOrder extends Controller {]]></search>
+            <add position="after"><![CDATA[
+                private function loadTerminals()
+                {
+                $terminals_json_file_dir = DIR_DOWNLOAD."omniva_terminals.json";
+                if (!file_exists($terminals_json_file_dir))
+                    return false;
+                $terminals_file = fopen($terminals_json_file_dir, "r");
+                if (!$terminals_file)
+                    return false;
+                $terminals = fread($terminals_file, filesize($terminals_json_file_dir) + 10);
+                fclose($terminals_file);
+                $terminals = json_decode($terminals, true);
+                return $terminals;
+                }
+                ]]>
+            </add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[$data['shipping'] = $this->url->link('sale/order/shipping', 'token=' . $this->session->data['token'], true);]]></search>
+            <add position="after"><![CDATA[
+                $data['omnivalt_label'] = $this->url->link('extension/shipping/omnivalt/labels', 'token=' . $this->session->data['token'], true);
+                $this->load->language('extension/shipping/omnivalt');
+                $data['generate_labels']   =$this->language->get('generate_labels');
+                $data['text_manifest']   =$this->language->get('print_manifest');
+                $data['omnivalt_manifest'] = $this->url->link('extension/shipping/omnivalt/manifest', 'token=' . $this->session->data['token'], true);
+            ]]></add>
+        </operation>
+        
+        <operation error="skip">
+            <search><![CDATA[$data['invoice'] = $this->url->link('sale/order/invoice', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);]]></search>
+            <add position="after"><![CDATA[
+            $data['omnivalt_label'] = $this->url->link('extension/shipping/omnivalt/labels', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);		    
+            $data['omnivalt_label_print'] = $this->url->link('extension/shipping/omnivalt/labelsprint', 'token=' . $this->session->data['token'] . '&order_id=' . (int)$this->request->get['order_id'], true);		              
+            ]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[$data['payment_method'] = $order_info['payment_method'];]]></search>
+            <add position="after"><![CDATA[
+            /* Additional field */
+			$data['orderCarrier'] = $order_info['shipping_code'];
+			$data['labelsCount'] = $order_info['labelsCount'];
+			$data['omnivaWeight'] = $order_info['omnivaWeight'];
+			$data['cod_amount'] = $order_info['cod_amount'];
+			$data['omniva_terminals'] = $this->loadTerminals();
+			$data['shipping_code'] = $order_info['shipping_code'];
+			$data['editOmniva'] = $this->url->link('extension/shipping/omnivalt/editLabel', 'token=' . $this->session->data['token']. '&order_id='.$data['order_id'], true);
+			$data['payment_code'] = $order_info['payment_code'];
+			$data['orderTotal'] = $order_info['total'];
+
+            $this->load->language('extension/shipping/omnivalt');
+            $data['labels_count']   = $this->language->get('labels_count');
+            $data['weight']   = $this->language->get('weight');
+            $data['delivery_method']   = $this->language->get('delivery_method');
+            $data['generate_labels']   = $this->language->get('generate_labels');
+            $data['text_cod_amount']   = $this->language->get('cod_amount');
+            $data['generate_label']   = $this->language->get('generate_label');
+            $data['renew']   = $this->language->get('renew');
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/view/template/sale/order_form.tpl">
+        <operation>
+            <search><![CDATA[for (j in json['shipping_methods'][i]['quote']) {]]></search>
+            <add position="after"><![CDATA[
+            if (json['shipping_methods'][i]['quote'][j]['code'] === 'fake.parcel_terminal') {
+                continue;
+            }
+            ]]></add>
+		</operation>
+    </file>
+
+    <file path="admin/view/template/sale/order_info.tpl">
+        <operation error="skip">
+            <search><![CDATA[<a href="<?php echo $invoice; ?>" target="_blank" data-toggle="tooltip" title="<?php echo $button_invoice_print; ?>" class="btn btn-info"><i class="fa fa-print"></i></a>]]></search>
+            <add position="before"><![CDATA[
+                <a href="<?php echo $omnivalt_label; ?>" target="_blank" data-toggle="tooltip" title="<?=$generate_labels;?>" class="btn btn-warning"><i class="fa fa-barcode"></i></a>
+            ]]></add>
+        </operation>
+        <operation error="skip">
+            <search><![CDATA[<h3 class="panel-title"><i class="fa fa-info-circle"></i> <?php echo $text_order; ?></h3>]]></search>
+            <add position="before"><![CDATA[
+              <?php 
+              if(substr($orderCarrier, 0, 8) == 'omnivalt') {
+              ?>
+              <form method="POST" action="<?= $editOmniva ;?>" >
+              <input type="hidden" value="<?= $order_id; ?>" name="order_id">
+              <h3 class="panel-title"><i class="fa fa-info-circle"></i> <?$heading_title;?></h3>
+              </div>
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <td colspan="2"><?=$labels_count;?>
+                      <select name="labelsCount" id="labelsCount" class="form-control input-sm">
+                          <option value="1" selected="">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                      </select>
+                    <td colspan="2">
+                      <?=$weight;?> <input type="number" step="0.0001" name="omnivaWeight" class="form-control input-sm" value="<?= $omnivaWeight; ?>">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">C.O.D 
+                      <select name="cod_available" class="form-control input-sm">
+                        <option value="0">Ne</option>
+                        <option value="1" <?php if(($payment_code == 'cod' OR $cod_amount >0) && $cod_amount != 888888) { ?> selected="" <?php } ?>>Taip</option>         
+                      </select>              
+                    </td>
+                    <td colspan="2">
+                      <?=$text_cod_amount;?>
+                        <input type="text" name="cod_value" class="form-control input-sm" value="<?php if($cod_amount && $cod_amount != 888888) print $cod_amount; else print $orderTotal; ?>">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="4"><?=$delivery_method;?>
+                      <select name="delivery_method" class="form-control input-sm">
+                        <option disabled>Select labels count</option>
+                        <option value="omnivalt.courier|OmnivaLt kurjeris">Omnivalt Courier</option>
+                            <?php $parcel_terminals = '';
+                            $grouped_options = array();
+                            foreach ($omniva_terminals as $terminal){
+                              if (!isset($grouped_options[$terminal[1]]))
+                                $grouped_options[(string)$terminal[1]] = array();
+                                $grouped_options[(string)$terminal[1]][(string)$terminal[3]] = $terminal[0].', '.$terminal[2];  
+                              }
+                            foreach ($grouped_options as $city=>$locs){
+                             $parcel_terminals .= '<optgroup label = "'.$city.'">';
+                              foreach ($locs as $key=>$loc){
+                                $parcel_terminals .= '<option value = "omnivalt.parcel_terminal_'.$key.'|'.$loc.'" '.('omnivalt.parcel_terminal_'.$key == $shipping_code ?'selected':'').'>'.$loc.'</option>';
+                              }
+                             $parcel_terminals .= '</optgroup>';
+                            }
+                            print $parcel_terminals;?>
+                    </select>
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+          <input type="submit" name="update" class="btn btn-default btn-sm" value="<?=$renew;?>">
+          <input type="submit" name="generateLabel" class="btn btn-default btn-sm" value="<?=$generate_label;?>">
+        </div>
+        </form>
+        <?php } ?>
+        <div class="panel panel-default">
+        <div class="panel-heading">
+        ]]></add>
+        </operation>
+    </file>
+
+    <file path="admin/view/template/sale/order_list.tpl">
+        <operation error="skip">
+            <search><![CDATA[<button type="submit" id="button-shipping" form="form-order" ]]></search>
+            <add position="before"><![CDATA[
+                <button type="submit" id="button-omnivalt-labels" form="form-order" formaction="<?php echo $omnivalt_label; ?>" formtarget="_blank" data-toggle="tooltip" title="<?=$generate_labels;?>" class="btn btn-warning"><i class="fa fa-barcode"></i></button>
+                <button type="submit" id="button-omnivalt-manifests" form="form-order" formaction="<?php echo $omnivalt_manifest; ?>" formtarget="_blank" data-toggle="tooltip" title="<?=$text_manifest;?>" class="btn btn-info"><i class="fa fa-file-text"></i></button>
+            ]]></add>
+        </operation>
+
+        <operation error="skip">
+            <search><![CDATA[<?php echo $footer; ?>]]></search>
+            <add position="before"><![CDATA[
+                <!-- Omniva (check if need to add logo) -->
+                <script type="text/javascript"><!--
+                $(document).ready(function(){
+                $('input[name^=\'shipping_code\'][value^=\'omnivalt\']')
+                    .closest('td').next().next()
+                    .append($('<img src="view/image/omniva-lt.png" alt="Omniva Logo" class="omniva-order-logo">'))
+                });
+                //--></script>
+                <style>
+                .omniva-order-logo {
+                height: 20px;
+                margin-left: 0.5rem;
+                }
+                </style>
+                <!-- Omniva END -->
+                ]]>
+            </add>
+        </operation>
+    </file>
+
+    <file path="admin/model/sale/order.php">
+        <operation error="skip">
+            <search><![CDATA[ $order_query->row['date_modified']]]></search>
+            <add position="after"><![CDATA[
+                ,'labelsCount'           => $order_query->row['labelsCount'],
+                'omnivaWeight'           => $order_query->row['omnivaWeight'],
+                'cod_amount'             => $order_query->row['cod_amount']
+            ]]></add>
+        </operation>
+    </file>
+
+    <!-- FRONT -->
+    <file path="catalog/view/theme/*/template/common/header.tpl" error="log">
+        <operation>
+            <search><![CDATA[</head>]]></search>
+                <add position="before"><![CDATA[   
+                <script>
+                    var omniva_map_translation = <?= json_encode($omniva_map_translation); ?>;
+                </script>
+                <link href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" rel="stylesheet">
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+                <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+                <script defer src="catalog/view/javascript/omniva-map.min.js" type="text/javascript"></script>
+                <link href="catalog/view/javascript/omniva-map.css" rel="stylesheet">
+            ]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/common/header.php">
+        <operation>
+            <search><![CDATA[public function index() {]]></search>
+            <add position="before"> <![CDATA[
+                private function getOmnivaTranslation() {
+                    $this->load->language('extension/shipping/omnivalt');
+                    return [
+                        'modal_header' => $this->language->get('text_omniva_map_head'),
+                        'search_bar_title' => $this->language->get('text_omniva_terminal_address'),
+                        'select_terminal' => $this->language->get('text_select_omn_terminal'),
+                        'search_bar_placeholder' => $this->language->get('text_omniva_search'),
+                        'place_not_found' => $this->language->get('text_omniva_not_found'),
+                        'show_on_map' => $this->language->get('text_omniva_show_map'),
+                        'show_more' => $this->language->get('text_omniva_show_more'),
+                        'search_back_to_list' => $this->language->get('text_omniva_back_to_list'),
+                        'terminal_not_selected' => $this->language->get('text_omniva_no_terminal'),
+                    ];
+                }
+            ]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[return $this->load->view('common/header', $data);]]></search>
+            <add position="before"><![CDATA[
+                $data['omniva_map_translation']=$this->getOmnivaTranslation();
+            ]]></add>
+        </operation>
+    </file>
+
+    <file path="catalog/view/theme/*/template/checkout/shipping_method.tpl" error="log">
+        <operation>
+        <search><![CDATA[<?php foreach ($shipping_method['quote'] as $quote) { ?>]]></search>
+        <add position="after"><![CDATA[
+            <?php
+            // Omniva (skip terminal locations)
+            if (strpos($quote['code'], 'omnivalt.parcel_terminal') !== false) {
+            continue;
+            } else if (strpos($quote['code'], 'fake.parcel_terminal') !== false) {
+            ?>
+            <script>
+            $(document).ready(function () {
+        var omnivaModuleReady = false;
+        $(document).on('click', 'input[type="radio"][name="shipping_method"]', function (e) {
+            if ($(this).val() === 'fake.parcel_terminal' && !omnivaModuleReady) {
+                omnivaModuleReady = $(this).omniva({
+                    country_code: '<?php echo $omni_country_code;?>',
+                    path_to_img: 'image/omniva/',
+                    callback: function (id) {
+                    omnivaModuleReady.val('omnivalt.parcel_terminal_' + id);
+                    },
+                    translate: omniva_map_translation,
+                    terminals: <?php echo json_encode($omni_terminals);?>,
+                });
+                omnivaModuleReady.trigger('omniva.show');
+
+                // with default template this should be enough even if user changes postcode (as he needs to press continue button)
+                var sameShipping = $('input[name="shipping_address"]');
+                if (sameShipping.length > 0 && sameShipping.is(':checked')) {
+                    omnivaModuleReady.trigger('omniva.postcode', [$('#input-payment-postcode').val()]);
+                } else {
+                    omnivaModuleReady.trigger('omniva.postcode', [$('#input-shipping-postcode').val()]);
+                }
+            } else {
+                if (omnivaModuleReady) {
+                if ($(this).is(omnivaModuleReady)) {
+                    omnivaModuleReady.trigger('omniva.show');
+                } else {
+                    omnivaModuleReady.trigger('omniva.hide');
+                }
+                }
+            }
+        });
+        $('input[type="radio"][name="shipping_method"]:checked').click();
+        $('#button-shipping-method').on('click', function (e) {
+            var $selectedOption = $('input[type="radio"][name="shipping_method"]:checked');
+            if ($($selectedOption).val().includes('fake.parcel')) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert(omniva_map_translation.terminal_not_selected);
+            }
+        });
+        });
+        </script>
+            <?php
+            }
+            // Omniva END
+            ?>
+            ]]>
+        </add>
+        </operation>
+    </file>
+    <file path="catalog/controller/checkout/shipping_method.php" error="log">
+        <operation>
+            <search><![CDATA[$this->response->setOutput($this->load->view('checkout/shipping_method', $data));]]></search>
+            <add position="before"><![CDATA[
+            $data['omni_terminals'] = $this->getTerminalForMap();
+                $data['omni_country_code'] = $this->getCountryForMap();
+            ]]></add>
+        </operation>
+
+        <operation>
+            <search><![CDATA[public function save() {]]></search>
+            <add position="before"><![CDATA[
+            private function getCountryForMap($country = "LT")
+            {
+                if (isset($this->session->data['shipping_address']['iso_code_2']))
+                                return $this->session->data['shipping_address']['iso_code_2'];
+                            return $country;
+            }
+
+            private function getTerminalForMap($selected = '', $country = "LT")
+            {
+                $country = $this->getCountryForMap($country);
+
+                $terminals_json_file_dir = DIR_DOWNLOAD."/locations.json";
+                $terminals_file = fopen($terminals_json_file_dir, "r");
+                $terminals = fread($terminals_file,filesize($terminals_json_file_dir)+10);
+                fclose($terminals_file);
+                $terminals = json_decode($terminals,true);
+
+                $parcel_terminals = '';
+            
+                if (is_array($terminals)){
+                $terminalsList = array();
+                foreach ($terminals as $terminal){
+                if ($terminal['A0_NAME'] != $country && in_array($country,array("LT","EE","LV")) || intval($terminal['TYPE']) == 1)
+                    continue;
+        
+                if (!isset($grouped_options[$terminal['A1_NAME']]))
+                    $grouped_options[(string)$terminal['A1_NAME']] = array();
+                $grouped_options[(string)$terminal['A1_NAME']][(string)$terminal['ZIP']] = $terminal['NAME'];
+                
+                $terminalsList[] = [$terminal['NAME'], $terminal['Y_COORDINATE'], $terminal['X_COORDINATE'], $terminal['ZIP'], $terminal['A1_NAME'], $terminal['A2_NAME'], $terminal['comment_lit']];
+                }
+                }
+                return $terminalsList;
+            }
+            ]]></add>
+        </operation>
+    </file>
+</modification>
